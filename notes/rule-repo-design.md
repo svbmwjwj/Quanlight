@@ -210,7 +210,7 @@ final, <代理策略>
 
 模拟器按真机探针确认的语义实现：先按规则类型，同类型内按订阅顺序，排在前面的列表先命中；主机规则都未命中时才按订阅顺序匹配 IP 规则，再落到 `final`（Claude，D-019）。模拟的列表只有 `[filter_remote]` 中的两个包，`final` 视为代理。
 
-主机规则类型的顺序为 `host`、`host-suffix`、`host-wildcard`、`host-keyword`；其中 `host` 先于 `host-suffix` 已由探针确认，后三者之间的先后暂按社区说法，尚未实测（Claude，待调研）。
+主机规则类型的顺序为 `host`、`host-suffix`、`host-wildcard`、`host-keyword`，同类型按加载顺序，已由探针确认；这只在开启“分流匹配优化”时成立，关闭时 host 类规则完全按加载顺序匹配，因此模板须开启该开关（Claude，D-025）。APNs 包排在直连列表之前，两种状态下都先命中（Claude）。
 
 ## 匹配语义探针
 
@@ -259,7 +259,7 @@ macOS 订阅同一组列表，只在配置模板上与 iOS 不同，第 3 阶段
 - [x] 两类设备都用代理托底（D-026）；境外服务包只留 APNs（D-027）；直连数据按常用场景整理（D-029）。
 - [ ] 反向检查首次命中的数量与处理方式（待调研）。
 - [ ] APNs 实际使用的 IP 网段，以及推送是否以纯 IP 连接（待调研）。
-- [ ] “分流匹配优化”开关的影响，以及 `host-suffix`、`host-wildcard`、`host-keyword` 之间的优先级（待调研）。
+- [x] “分流匹配优化”开关的影响与主机规则类型的优先级（D-025）。
 - [ ] jsDelivr 与 GitHub 地址在大陆直连的可用性（待调研）。
 
 [^1]: 官方 `sample.conf` 第 276～277 行只说明 `host-keyword, .` 会跳过未命中域名的 DNS 查询，且纯 IP 请求不被主机类规则匹配；类型优先级出自 limbopro.com/archives/30471.html，未经官方证实。

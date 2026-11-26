@@ -33,5 +33,5 @@ doc: notes/rule-repo-design.md
 
 ## 影响
 
-- 类型优先只在开启“分流优化”时成立；关闭时退化为纯加载顺序，`direct-exceptions` 须排在所有服务包之前的现有约定仍然必要。
+- 类型优先只在开启“分流优化”时成立；关闭时退化为纯加载顺序，`direct-exceptions` 须排在所有服务包之前的现有约定仍然必要。（`direct-exceptions` 已随 D-027 退役。）
 - 设计文档“构建与检查”一节应注明这一前提。
