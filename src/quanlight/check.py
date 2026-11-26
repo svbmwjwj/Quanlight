@@ -6,7 +6,7 @@ from datetime import date
 from fnmatch import fnmatchcase
 import ipaddress
 
-from .match import IPNetwork, RuleList, networks_overlap, rule_matches_host
+from .match import HOST_TYPE_PRIORITY, IPNetwork, RuleList, networks_overlap, rule_matches_host
 from .model import HOST_TYPES, Bundle, Rule
 
 
@@ -48,33 +48,41 @@ class _HostIndex:
     def __init__(self, rules: Iterable[Rule]):
         self.exact: dict[str, Rule] = {}
         self.suffix: dict[str, Rule] = {}
-        self.patterns: list[Rule] = []
+        self.wildcards: list[Rule] = []
+        self.keywords: list[Rule] = []
         for rule in rules:
             if rule.type == "host":
                 self.exact.setdefault(rule.value, rule)
             elif rule.type == "host-suffix":
                 self.suffix.setdefault(rule.value, rule)
-            elif rule.type in ("host-wildcard", "host-keyword"):
-                self.patterns.append(rule)
+            elif rule.type == "host-wildcard":
+                self.wildcards.append(rule)
+            elif rule.type == "host-keyword":
+                self.keywords.append(rule)
 
-    def match(self, host: str) -> Rule | None:
-        if host in self.exact:
-            return self.exact[host]
-        labels = host.split(".")
-        for i in range(len(labels)):
-            if (rule := self.suffix.get(".".join(labels[i:]))) is not None:
-                return rule
-        for rule in self.patterns:
-            hit = fnmatchcase(host, rule.value) if rule.type == "host-wildcard" else rule.value in host
-            if hit:
-                return rule
+    def match(self, host: str, rule_type: str) -> Rule | None:
+        """只在指定类型的规则中查找命中。"""
+        if rule_type == "host":
+            return self.exact.get(host)
+        if rule_type == "host-suffix":
+            labels = host.split(".")
+            for i in range(len(labels)):
+                if (rule := self.suffix.get(".".join(labels[i:]))) is not None:
+                    return rule
+            return None
+        if rule_type == "host-wildcard":
+            return next((rule for rule in self.wildcards if fnmatchcase(host, rule.value)), None)
+        if rule_type == "host-keyword":
+            return next((rule for rule in self.keywords if rule.value in host), None)
         return None
 
 
 def _first_match(indexed: list[tuple[RuleList, _HostIndex]], host: str) -> tuple[RuleList, Rule] | None:
-    for rule_list, index in indexed:
-        if (rule := index.match(host)) is not None:
-            return rule_list, rule
+    """与 match.route 相同的语义：类型优先，同类型内按列表顺序。"""
+    for rule_type in HOST_TYPE_PRIORITY:
+        for rule_list, index in indexed:
+            if (rule := index.match(host, rule_type)) is not None:
+                return rule_list, rule
     return None
 
 

@@ -1,7 +1,7 @@
-"""单条规则匹配，以及模拟 Quantumult X 的按顺序路由。
+"""单条规则匹配，以及模拟 Quantumult X 的路由。
 
-路由模型（先按顺序匹配所有列表的主机规则，再匹配 IP 规则，最后落到 final）
-是暂定的，待真机探针验证后再确认。
+路由模型按 D-019 真机探针：规则类型优先，同类型内按列表顺序，排在前面的列表先命中；
+主机规则都未命中时再按列表顺序匹配 IP 规则，最后落到 final。
 """
 
 import ipaddress
@@ -13,6 +13,11 @@ from .model import Rule, normalize_host
 
 IPAddress = ipaddress.IPv4Address | ipaddress.IPv6Address
 IPNetwork = ipaddress.IPv4Network | ipaddress.IPv6Network
+
+
+# 主机规则类型的匹配优先级。host 先于 host-suffix 已由 D-019 真机探针确认；
+# host-suffix、host-wildcard、host-keyword 之间的先后尚未实测，暂按社区说法排列。
+HOST_TYPE_PRIORITY = ("host", "host-suffix", "host-wildcard", "host-keyword")
 
 
 @dataclass(frozen=True)
@@ -49,9 +54,10 @@ def networks_overlap(a: IPNetwork, b: IPNetwork) -> bool:
 
 def route(lists: Sequence[RuleList], host: str | None, ip: IPAddress | None, final: str) -> str:
     if host is not None:
-        for rule_list in lists:
-            if any(rule_matches_host(rule, host) for rule in rule_list.rules):
-                return rule_list.policy
+        for rule_type in HOST_TYPE_PRIORITY:
+            for rule_list in lists:
+                if any(rule.type == rule_type and rule_matches_host(rule, host) for rule in rule_list.rules):
+                    return rule_list.policy
     if ip is not None:
         for rule_list in lists:
             if any(rule_matches_ip(rule, ip) for rule in rule_list.rules):
