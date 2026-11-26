@@ -266,7 +266,10 @@ final, direct
 - 发布说明同时给出 GitHub 版与境内版的 `[filter_remote]` 片段（Claude，D-015）。
 - 个人配置直接订阅本仓库发布的列表，不再订阅他人加工的列表；第 2 阶段的服务包建成前，尚未覆盖的服务暂时保留原有订阅（用户：直接引用自己的规则集；过渡安排 Claude，D-014）。
 - 模板：仓库的 `templates/` 提供去除私人订阅、密钥、节点检测脚本、MITM 证书与个人域名的 iOS、macOS 配置模板；本人的实际配置只放在 `~/.config/quanlight/configs/`（用户，D-016）。
-- 更新：自动流程只检测各来源的变化并试构建；发布在真机检测或探针之后由人工触发，不设固定周期；配置中的规则集不设置自动更新时间（用户，D-020）。现有工作流仍是每日自动发布，尚未按此修改（待定）。
+- 更新：自动流程只检测各来源的变化并试构建；发布在真机检测或探针之后由人工触发，不设固定周期；配置中的规则集不设置自动更新时间（用户，D-020）。
+  - 检测：`build.yml` 在每天北京时间 02:00 与推送 `main` 时运行测试、构建与检查，并在 Actions 摘要中列出产物相对 `release` 分支的变化，不发布；此时令牌只有读权限（Claude）。
+  - 发布：在 Actions 页面对 `main` 手动运行 `build` 并勾选 `publish`，检查通过后由单独的任务强制推送 `release` 并刷新 jsDelivr；读取 `release` 失败时不推送（Claude）。
+  - 自动更新：省略 `update-interval` 时，Quantumult X 对所有远程资源每 86400 秒自动同步一次，负数才关闭自动同步[^2]；因此模板、本人配置与发布说明片段的 `[filter_remote]` 都写 `update-interval=-1`，`[server_remote]`、`[rewrite_remote]` 不变（用户，D-023）。
 - 许可证：构建代码与产物均为 MIT；NOTICE 列出 v2fly（MIT，保留其版权声明）与 Telegram 官方网段等来源（Claude，D-013）。
 
 ## macOS 白名单
@@ -293,3 +296,4 @@ final, direct
 - [ ] macOS 未命中的域名是否先查 DNS（待定）。
 
 [^1]: 官方 `sample.conf` 第 276～277 行只说明 `host-keyword, .` 会跳过未命中域名的 DNS 查询，且纯 IP 请求不被主机类规则匹配；类型优先级出自 limbopro.com/archives/30471.html，未经官方证实。
+[^2]: 官方 `sample.conf`（v1.5.5 build 914）第 117～118 行，https://raw.githubusercontent.com/crossutility/Quantumult-X/master/sample.conf
