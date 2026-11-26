@@ -1,0 +1,10 @@
+include:tld-cn
+example.cn
+domain:alt.example.cn
+full:api.example-cdn.com
+domain:example.cn  # duplicate
+overseas.example.cn @!cn
+ads.example.cn @ads
+keyword:cnkw
+regexp:^x\.example\.cn$
+include:svc @-!cn

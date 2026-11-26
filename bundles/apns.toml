@@ -1,9 +1,9 @@
 name = "apns"
-description = "Apple Push Notification service, shared by every app"
+description = "Apple Push Notification service, forced through the proxy ahead of the direct list"
 order = 10
 
 [[rule]]
 type = "host-suffix"
 value = "push.apple.com"
-role = "core"
 source = "manual"
+reason = "Apple uses this subzone only for push; Telegram and similar apps lose notifications when it goes direct (D-008, D-027)"

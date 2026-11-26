@@ -2,8 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from quanlight.model import Bundle, Rule
-from quanlight.v2fly import V2flyError, diff, expand, to_rules
+from quanlight.v2fly import V2flyError, expand, foreign_domains, import_direct
 
 DATA = Path(__file__).parent / "fixtures" / "v2fly"
 
@@ -40,44 +39,43 @@ def test_expand_cycle_and_missing():
         expand(DATA, "broken")
 
 
-def test_to_rules_mapping():
-    result = to_rules(expand(DATA, "svc", exclude=["youtube"]), source="v2fly:svc")
-    got = {(r.type, r.value, r.role) for r in result.rules}
-    assert ("host-suffix", "svc.com", "core") in got
-    assert ("host-suffix", "alt-svc.com", "core") in got
-    assert ("host", "api.svc-cdn.net", "core") in got
-    assert ("host-suffix", "cn.svc.com", "cn-exception") in got
-    assert ("host", "dl.svc.com", "cn-exception") in got
-    assert all(r.source == "v2fly:svc" for r in result.rules)
-    skipped = {(e.value, reason) for e, reason in result.skipped}
-    assert ("svckw", "keyword-needs-review") in skipped
-    assert (r"^x\.svc\.com$", "regexp-unsupported") in skipped
-    assert ("ads.svc.com", "ads") in skipped
-    assert not any(r.value == "ads.svc.com" for r in result.rules)
-
-
-def test_diff():
-    imported = to_rules(expand(DATA, "svc-sub"), source="v2fly:svc-sub")
-    bundle = Bundle(
-        name="svc",
-        description="d",
-        order=1,
-        rules=(
-            Rule("host-suffix", "sub.com", "core", "v2fly:svc-sub"),
-            Rule("host-suffix", "gone.com", "core", "v2fly:svc-sub"),
-            Rule("host", "manual.example.com", "core", "manual"),
-        ),
-    )
-    added, removed = diff(bundle, imported)
-    assert [(r.type, r.value) for r in added] == [("host-suffix", "sub-cn.com")]
-    assert [(r.type, r.value) for r in removed] == [("host-suffix", "gone.com")]
-
-
 def test_expand_filter_applies_to_nested_includes():
     assert values(expand(DATA, "nest-top")) == ["leafcn.com", "midcn.com"]
 
 
-def test_diff_skips_ignored_values():
-    imported = to_rules(expand(DATA, "svc-sub"), source="v2fly:svc-sub")
-    bundle = Bundle("svc", "d", 1, (Rule("host-suffix", "sub.com", "core", "v2fly:svc-sub"),), v2fly_ignore=("sub-cn.com",))
-    assert diff(bundle, imported) == ([], [])
+def test_import_direct_mapping():
+    result = import_direct(expand(DATA, "geolocation-cn"), source="v2fly:geolocation-cn")
+    got = [(r.type, r.value) for r in result.rules]
+    assert got == [
+        ("host-suffix", "cn"),
+        ("host-suffix", "example.cn"),
+        ("host-suffix", "alt.example.cn"),
+        ("host", "api.example-cdn.com"),
+        ("host-suffix", "svc.com"),
+        ("host-suffix", "alt-svc.com"),
+        ("host", "api.svc-cdn.net"),
+        ("host-suffix", "cn.svc.com"),
+        ("host", "dl.svc.com"),
+        ("host-suffix", "tracked.svc.com"),
+        ("host-suffix", "sub.com"),
+        ("host-suffix", "sub-cn.com"),
+        ("host-suffix", "youtube.com"),
+    ]
+    assert all(r.source == "v2fly:geolocation-cn" for r in result.rules)
+    skipped = {(e.value, reason) for e, reason in result.skipped}
+    assert ("overseas.example.cn", "not-cn") in skipped
+    assert ("ads.example.cn", "ads") in skipped
+    assert ("cnkw", "keyword") in skipped
+    assert (r"^x\.example\.cn$", "regexp") in skipped
+    assert ("svckw", "keyword") in skipped
+
+
+def test_import_direct_rejects_unknown_kind(tmp_path):
+    (tmp_path / "f").write_text("weird:example.com\n")
+    with pytest.raises(V2flyError, match="weird"):
+        import_direct(expand(tmp_path, "f"), source="x")
+
+
+def test_foreign_domains_drop_cn_and_patterns():
+    domains = foreign_domains(expand(DATA, "geolocation-!cn"))
+    assert domains == ["google.com", "www.google.cn", "t.me", "example.cn"]

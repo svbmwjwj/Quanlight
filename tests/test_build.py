@@ -1,47 +1,54 @@
-from datetime import date
 from ipaddress import ip_network
 from pathlib import Path
 
-from quanlight.cli import CheckData, build
-from quanlight.manifest import dump_bundle
-from quanlight.model import Bundle, Rule
+from quanlight.build import CheckData, Upstream, build, read_previous_counts
+from quanlight.model import Rule
 
-TODAY = date(2026, 11, 26)
-FIX = Path(__file__).parent / "fixtures"
-TG_CIDR = (FIX / "telegram-cidr.txt").read_text()
+APNS = 'name = "apns"\ndescription = "d"\norder = 10\n[[rule]]\ntype = "host-suffix"\nvalue = "push.apple.com"\nsource = "manual"\nreason = "r"\n'
+CHINA = (
+    'name = "china"\ndescription = "d"\norder = 20\n'
+    '[[upstream]]\nkind = "dnsmasq-china-list"\n[[upstream]]\nkind = "china-operator-ip"\n'
+)
+SAMPLES = (
+    '[[sample]]\nhost = "courier.push.apple.com"\nexpect = "apns"\n'
+    '[[sample]]\nhost = "www.taobao.com"\nexpect = "direct"\n'
+    '[[sample]]\nhost = "www.google.com"\nexpect = "final"\n'
+    '[[sample]]\nip = "1.0.1.1"\nexpect = "direct"\n'
+    '[[sample]]\nip = "91.108.56.1"\nexpect = "final"\n'
+)
 
 
-def r(type_, value, role="core"):
-    return Rule(type=type_, value=value, role=role, source="manual")
+def hs(value, source="dnsmasq-china-list"):
+    return Rule("host-suffix", value, source)
 
 
-def setup(tmp_path: Path, extra_rule: Rule | None = None, samples: str | None = None) -> dict:
+def setup(tmp_path: Path, china_extra: str = "", dnsmasq=("taobao.com", "qq.com"), samples=SAMPLES) -> dict:
     bundles_dir = tmp_path / "bundles"
-    bundles_dir.mkdir()
-    tg_rules = (r("host-suffix", "telegram.org"), r("host", "t.me")) + ((extra_rule,) if extra_rule else ())
-    (bundles_dir / "telegram.toml").write_text(
-        dump_bundle(Bundle("telegram", "Telegram", 40, tg_rules, upstream=("telegram-cidr",)))
-    )
-    (bundles_dir / "apns.toml").write_text(dump_bundle(Bundle("apns", "APNs", 10, (r("host-suffix", "push.apple.com"),))))
+    bundles_dir.mkdir(parents=True)
+    (bundles_dir / "apns.toml").write_text(APNS)
+    (bundles_dir / "china.toml").write_text(CHINA + china_extra)
     samples_path = tmp_path / "samples.toml"
-    samples_path.write_text(
-        samples
-        or '[[sample]]\nhost = "courier.push.apple.com"\nexpect = "apns"\n'
-        '[[sample]]\nhost = "www.taobao.com"\nexpect = "direct"\n'
-        '[[sample]]\nip = "91.108.56.1"\nexpect = "telegram"\n'
-    )
-    data = CheckData(
-        cn_domains={"taobao.com", "qq.com"},
-        cn_networks=[ip_network("1.0.1.0/24")],
-        provenance={"dnsmasq-china-list": "abc123"},
+    samples_path.write_text(samples)
+    upstream = {
+        "dnsmasq-china-list": Upstream("dnsmasq-china-list", "abc", [hs(d) for d in dnsmasq]),
+        "china-operator-ip": Upstream(
+            "china-operator-ip",
+            "def",
+            [Rule("ip-cidr", "1.0.1.0/24", "china-operator-ip"), Rule("ip6-cidr", "2400::/12", "china-operator-ip")],
+        ),
+    }
+    check = CheckData(
+        domains={"v2fly geolocation-!cn": ["google.com", "t.me"]},
+        networks={"telegram-cidr": [ip_network("91.108.56.0/22")]},
+        provenance={"v2fly geolocation-!cn": "v2sha", "telegram-cidr": "sha256:x"},
     )
     return dict(
         bundles_dir=bundles_dir,
         out_dir=tmp_path / "dist",
-        today=TODAY,
-        data=data,
-        upstream={"telegram-cidr": TG_CIDR},
+        upstream=upstream,
+        check=check,
         samples=samples_path,
+        previous={"dnsmasq-china-list": 3, "china-operator-ip": 2},
         owner="owner",
         repo="quanlight",
         static_files=(),
@@ -53,59 +60,83 @@ def test_build_writes_lists(tmp_path):
     report = build(**args)
     assert report.errors == []
     out = args["out_dir"]
-    assert (out / "ios" / "apns.list").is_file()
-    assert (out / "ios" / "direct-exceptions.list").is_file()
-    telegram = (out / "ios" / "telegram.list").read_text()
-    assert "ip-cidr, 91.108.56.0/22, telegram" in telegram
-    assert "ip6-cidr, 2001:b28:f23d::/48, telegram" in telegram
+    china = (out / "china.list").read_text()
+    assert "host-suffix, taobao.com, china" in china
+    assert "ip6-cidr, 2400::/12, china" in china
+    assert "# upstream dnsmasq-china-list: abc (entries: 2)" in china
+    assert "host-suffix, push.apple.com, apns" in (out / "apns.list").read_text()
     readme = (out / "README.md").read_text()
-    assert "https://raw.githubusercontent.com/owner/quanlight/release/ios/telegram.list" in readme
-    assert "https://ghfast.top/" in readme
-    assert report.counts["telegram"] == 5
+    assert "https://raw.githubusercontent.com/owner/quanlight/release/china.list" in readme
+    assert report.counts == {"apns": 1, "china": 4}
+    assert report.sizes["china"] == (out / "china.list").stat().st_size
+    assert read_previous_counts(out / "china.list") == {"dnsmasq-china-list": 2, "china-operator-ip": 2}
 
 
-def test_build_fails_without_writing(tmp_path):
-    args = setup(tmp_path, extra_rule=r("host-suffix", "qq.com"))
+def test_reverse_hit_fails_without_writing(tmp_path):
+    args = setup(tmp_path, dnsmasq=("taobao.com", "google.com"))
     report = build(**args)
-    assert any("qq.com" in e for e in report.errors)
+    assert any("reverse check" in e for e in report.errors)
+    assert [(h.target, h.rule.value) for h in report.hits] == [("google.com", "google.com")]
+    assert "google.com" in report.to_markdown()
     assert not args["out_dir"].exists()
+
+
+def test_exclude_and_keep_clear_hits(tmp_path):
+    excluded = setup(tmp_path / "a", '[[exclude]]\nvalue = "google.com"\nreason = "overseas"\n', ("taobao.com", "google.com"))
+    report = build(**excluded)
+    assert report.errors == []
+    assert "google.com" not in (excluded["out_dir"] / "china.list").read_text()
+    assert report.sources["dnsmasq-china-list"].added == 1
+    kept = setup(tmp_path / "b", '[[keep]]\nvalue = "t.me"\nreason = "checked"\n', ("taobao.com", "t.me"))
+    report = build(**kept)
+    assert report.errors == []
+    assert [h.target for h in report.kept] == ["t.me"]
+    assert "host-suffix, t.me, china" in (kept["out_dir"] / "china.list").read_text()
+
+
+def test_unused_exclude_and_keep_warn(tmp_path):
+    extra = '[[exclude]]\nvalue = "gone.com"\nreason = "r"\n[[keep]]\nvalue = "old.com"\nreason = "r"\n'
+    report = build(**setup(tmp_path, extra))
+    assert report.errors == []
+    assert any("gone.com" in w for w in report.warnings) and any("old.com" in w for w in report.warnings)
+
+
+def test_network_overlap_fails(tmp_path):
+    args = setup(tmp_path)
+    args["check"].networks["google-ipranges"] = [ip_network("1.0.0.0/16")]
+    report = build(**args)
+    assert [(h.target, h.rule.value) for h in report.hits] == [("1.0.0.0/16", "1.0.1.0/24")]
+
+
+def test_direct_rule_under_apns_fails(tmp_path):
+    extra = '[[rule]]\ntype = "host"\nvalue = "courier.push.apple.com"\nsource = "manual"\nreason = "r"\n'
+    report = build(**setup(tmp_path, extra))
+    assert any("courier.push.apple.com" in e and "apns" in e for e in report.errors)
 
 
 def test_samples_mismatch_fails(tmp_path):
-    args = setup(tmp_path, samples='[[sample]]\nhost = "web.telegram.org"\nexpect = "direct"\n')
+    args = setup(tmp_path, samples='[[sample]]\nhost = "www.google.com"\nexpect = "direct"\n')
     report = build(**args)
-    assert any("web.telegram.org" in e for e in report.errors)
+    assert any("www.google.com" in e for e in report.errors)
     assert not args["out_dir"].exists()
 
 
-def test_upstream_empty_fails(tmp_path):
-    args = setup(tmp_path)
-    args["upstream"] = {"telegram-cidr": ""}
+def test_upstream_drop_fails_and_missing_previous_warns(tmp_path):
+    args = setup(tmp_path / "a")
+    args["previous"] = {"dnsmasq-china-list": 5}
+    assert any("down from 5" in e for e in build(**args).errors)
+    args = setup(tmp_path / "b")
+    args["previous"] = None
     report = build(**args)
-    assert any("telegram-cidr" in e for e in report.errors)
-    assert not args["out_dir"].exists()
+    assert report.errors == [] and any("drop check skipped" in w for w in report.warnings)
 
 
-def test_report_markdown_lists_errors(tmp_path):
-    args = setup(tmp_path, extra_rule=r("host-suffix", "qq.com"))
-    assert "qq.com" in build(**args).to_markdown()
-
-
-def test_diff_v2fly_reports_changes(tmp_path, capsys):
-    from quanlight.cli import main
-
-    bundles = tmp_path / "bundles"
-    bundles.mkdir()
-    rules = (
-        Rule("host-suffix", "sub.com", "core", "v2fly:svc-sub"),
-        Rule("host-suffix", "gone.com", "core", "v2fly:svc-sub"),
-    )
-    (bundles / "svc.toml").write_text(dump_bundle(Bundle("svc", "d", 10, rules)))
-    code = main(["diff-v2fly", "--bundles", str(bundles), "--v2fly-data", str(FIX / "v2fly")])
-    out = capsys.readouterr().out
-    assert code == 0
-    assert "| svc | added | host-suffix, sub-cn.com |" in out
-    assert "| svc | removed | host-suffix, gone.com |" in out
+def test_missing_or_invalid_upstream_fails(tmp_path):
+    args = setup(tmp_path / "a")
+    del args["upstream"]["china-operator-ip"]
+    assert any("no upstream data" in e for e in build(**args).errors)
+    args = setup(tmp_path / "b", dnsmasq=("bad host.com",))
+    assert any("bad host.com" in e for e in build(**args).errors)
 
 
 def test_build_refuses_to_wipe_foreign_out_dir(tmp_path):
@@ -114,14 +145,13 @@ def test_build_refuses_to_wipe_foreign_out_dir(tmp_path):
     foreign.mkdir()
     (foreign / "keep.txt").write_text("keep")
     args["out_dir"] = foreign
-    report = build(**args)
-    assert report.errors
+    assert build(**args).errors
     assert (foreign / "keep.txt").read_text() == "keep"
 
 
 def test_build_replaces_its_own_previous_output(tmp_path):
     args = setup(tmp_path)
     assert build(**args).errors == []
-    (args["out_dir"] / "ios" / "stale.list").write_text("old")
+    (args["out_dir"] / "stale.list").write_text("old")
     assert build(**args).errors == []
-    assert not (args["out_dir"] / "ios" / "stale.list").exists()
+    assert not (args["out_dir"] / "stale.list").exists()

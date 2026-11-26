@@ -1,27 +1,19 @@
-# 发布的 iOS 列表的期望去向："direct" 或包名。
+# 模拟订阅后的期望去向：apns（APNs 包，强制代理）、direct（china 直连列表）、final（未命中，代理托底）。
 
 [[sample]]
 host = "courier.push.apple.com"
 expect = "apns"
 
 [[sample]]
-host = "api.apple.com"
-expect = "direct"
-
-[[sample]]
-host = "web.telegram.org"
-expect = "telegram"
-
-[[sample]]
-host = "t.me"
-expect = "telegram"
-
-[[sample]]
-ip = "91.108.4.1"
-expect = "telegram"
+host = "1-courier.push.apple.com"
+expect = "apns"
 
 [[sample]]
 host = "www.taobao.com"
+expect = "direct"
+
+[[sample]]
+host = "g.alicdn.com"
 expect = "direct"
 
 [[sample]]
@@ -29,141 +21,81 @@ host = "weixin.qq.com"
 expect = "direct"
 
 [[sample]]
-host = "api.bilibili.com"
+host = "dns.weixin.qq.com"
 expect = "direct"
 
 [[sample]]
-host = "x.com"
-expect = "twitter"
+host = "www.alipay.com"
+expect = "direct"
 
 [[sample]]
-host = "pbs.twimg.com"
-expect = "twitter"
+host = "mobilegw.alipay.com"
+expect = "direct"
 
 [[sample]]
-host = "github.com"
-expect = "github"
-
-[[sample]]
-host = "objects.githubusercontent.com"
-expect = "github"
-
-[[sample]]
-host = "www.linkedin.com"
-expect = "linkedin"
-
-[[sample]]
-host = "www.youtube.com"
-expect = "google"
-
-[[sample]]
-host = "i.ytimg.com"
-expect = "google"
+host = "api.bilibili.com"
+expect = "direct"
 
 [[sample]]
 host = "www.bilibili.com"
 expect = "direct"
 
 [[sample]]
-host = "www.google.com"
-expect = "google"
-
-[[sample]]
-host = "mail.google.com"
-expect = "google"
-
-[[sample]]
-host = "play.googleapis.com"
-expect = "google"
-
-[[sample]]
-host = "googleapis.cn"
+host = "www.baidu.com"
 expect = "direct"
 
 [[sample]]
-host = "c.android.clients.google.com"
-expect = "google"
+host = "www.12306.cn"
+expect = "direct"
+
+[[sample]]
+host = "www.google.com"
+expect = "final"
+
+[[sample]]
+host = "www.youtube.com"
+expect = "final"
+
+[[sample]]
+host = "web.telegram.org"
+expect = "final"
+
+[[sample]]
+host = "t.me"
+expect = "final"
 
 [[sample]]
 host = "claude.ai"
-expect = "claude"
+expect = "final"
 
 [[sample]]
 host = "api.anthropic.com"
-expect = "claude"
+expect = "final"
 
 [[sample]]
-host = "maps.googleapis.com"
-expect = "claude"
+host = "x.com"
+expect = "final"
 
 [[sample]]
-host = "o1158394.ingest.us.sentry.io"
-expect = "claude"
+host = "pbs.twimg.com"
+expect = "final"
 
 [[sample]]
-ip = "160.79.104.10"
-expect = "claude"
+host = "github.com"
+expect = "final"
 
 [[sample]]
-host = "oauth2.googleapis.com"
-expect = "google"
+ip = "91.108.4.1"
+expect = "final"
 
 [[sample]]
-host = "fonts.googleapis.com"
+ip = "8.8.8.8"
+expect = "final"
+
+[[sample]]
+ip = "114.114.114.114"
 expect = "direct"
 
 [[sample]]
-host = "rainbow.me"
-expect = "crypto"
-
-[[sample]]
-host = "phantom.app"
-expect = "crypto"
-
-[[sample]]
-host = "www.kraken.com"
-expect = "crypto"
-
-[[sample]]
-host = "app.uniswap.org"
-expect = "crypto"
-
-[[sample]]
-host = "etherscan.io"
-expect = "crypto"
-
-[[sample]]
-host = "app.hyperliquid.xyz"
-expect = "crypto"
-
-[[sample]]
-host = "abc.arweave.net"
-expect = "crypto"
-
-[[sample]]
-host = "ipfs.io"
-expect = "crypto"
-
-[[sample]]
-host = "www.binance.com"
+ip = "223.5.5.5"
 expect = "direct"
-
-[[sample]]
-host = "www.gstatic.com"
-expect = "google"
-
-[[sample]]
-host = "ssl.gstatic.com"
-expect = "google"
-
-[[sample]]
-host = "dl.google.com"
-expect = "direct"
-
-[[sample]]
-host = "phantom.com"
-expect = "crypto"
-
-[[sample]]
-host = "relay.walletconnect.com"
-expect = "crypto"

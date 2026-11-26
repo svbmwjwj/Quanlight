@@ -1,5 +1,6 @@
 """网络访问：普通下载、上游提交哈希与 v2fly 数据压缩包。"""
 
+import http.client
 import io
 import json
 import os
@@ -26,7 +27,8 @@ def fetch_bytes(url: str, retries: int = 3, headers: dict[str, str] | None = Non
     for attempt in range(retries):
         try:
             return _request(url, headers)
-        except OSError as exc:  # URLError 与 HTTPError 都是 OSError 的子类
+        # URLError 与 HTTPError 都是 OSError 的子类；IncompleteRead 等读到一半断开的情况属于 HTTPException
+        except (OSError, http.client.HTTPException) as exc:
             last = exc
             time.sleep(2**attempt)
     raise FetchError(f"failed to fetch {url}: {last}")

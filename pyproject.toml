@@ -1,7 +1,7 @@
 [project]
 name = "quanlight"
 version = "0.1.0"
-description = "Build Quantumult X filter lists from reviewed service bundle manifests"
+description = "Build Quantumult X direct lists for proxy-fallback profiles"
 readme = "README.md"
 authors = [
     { name = "svbmwjwj", email = "255624542+svbmwjwj@users.noreply.github.com" }

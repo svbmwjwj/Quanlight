@@ -1,23 +1,29 @@
 # Quanlight
 
-Quantumult X filter lists built from reviewed, per-service manifests.
+Quantumult X filter lists for a proxy-fallback setup: mainland China domains
+and networks connect directly, and everything else falls through to `final`
+and goes through your proxy.
 
-Each rule is chosen with the narrowest Quantumult X rule type that covers the
-service, and every build checks that no proxy rule captures mainland China
-domains or networks before anything is published.
+The direct list is rebuilt from public datasets on every build, and every
+build checks that no overseas domain or network in the reverse-check data is
+routed directly before anything is published.
 
-## Profiles
+## Lists
 
-- iOS (blacklist): only the services you subscribe to go through a proxy;
-  everything else connects directly. One list per service, plus a shared
-  Apple Push Notification list.
-- macOS (whitelist): planned; only confirmed mainland services connect
-  directly.
+- `apns.list`: Apple Push Notification service. Subscribe it first and force
+  it through the proxy; push notifications for apps such as Telegram fail
+  when it connects directly.
+- `china.list`: mainland China domains and networks, forced to `direct`.
+  Built from dnsmasq-china-list (`accelerated-domains.china.conf`), v2fly
+  `geolocation-cn` and gaoyifan/china-operator-ip.
+
+iOS and macOS subscribe to the same lists.
 
 ## Subscribe
 
-Lists are published on the `release` branch. Use the GitHub link where it is
-reachable and a mainland-friendly mirror otherwise; all serve the same files:
+Lists are published at the root of the `release` branch. Use the GitHub link
+where it is reachable and a mainland-friendly mirror otherwise; all serve the
+same files:
 
 | Mirror | Base URL |
 |---|---|
@@ -26,22 +32,37 @@ reachable and a mainland-friendly mirror otherwise; all serve the same files:
 | jsDelivr (Fastly) | `https://fastly.jsdelivr.net/gh/svbmwjwj/quanlight@release` |
 | jsDelivr | `https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release` |
 
-Append `/ios/<name>.list` to a base URL. A third-party proxy can see and
-alter what it serves; prefer GitHub or jsDelivr when they work for you.
+A third-party proxy can see and alter what it serves; prefer GitHub or
+jsDelivr when they work for you.
 
-The release branch's `README.md` contains a ready-to-paste `[filter_remote]`
-snippet in the correct order. Every line needs a `force-policy`: replace
-`<proxy-policy>` with your own policy name, otherwise the rules point at a
-policy that does not exist. End `[filter_local]` with `final, direct`.
+```
+[filter_remote]
+https://raw.githubusercontent.com/svbmwjwj/quanlight/release/apns.list, tag=quanlight-apns, force-policy=<proxy-policy>, update-interval=-1, opt-parser=false, enabled=true
+https://raw.githubusercontent.com/svbmwjwj/quanlight/release/china.list, tag=quanlight-china, force-policy=direct, update-interval=-1, opt-parser=false, enabled=true
+FILTER_LAN, tag=LAN, force-policy=direct, enabled=true
+
+[filter_local]
+# personal exceptions go here
+final, <proxy-policy>
+```
+
+Keep `apns.list` above `china.list`. Every line needs its `force-policy`:
+replace `<proxy-policy>` with your own policy name, otherwise the rules point
+at a policy that does not exist. `update-interval=-1` turns off automatic
+syncing; update the lists by hand after a release. The release branch's
+`README.md` has the same snippet for GitHub and the mainland mirror.
+
+Domains that match no rule are resolved by the `[dns]` servers in your
+profile; addresses inside mainland networks connect directly and the rest go
+through `final`.
 
 ## Templates
 
 `templates/` holds ready-to-adapt profiles with every private value replaced by
 a `<...>` placeholder:
 
-- `templates/ios_blacklist.conf`: blacklist mode on quanlight lists.
-- `templates/macos_whitelist.conf`: whitelist mode; uses third-party direct lists until
-  quanlight's macOS lists exist.
+- `templates/ios_whitelist.conf`: iOS profile on the quanlight lists.
+- `templates/macos_whitelist.conf`: macOS profile on the same lists.
 
 ## Build locally
 
@@ -50,24 +71,23 @@ uv run pytest
 uv run quanlight build --out dist
 ```
 
-The build downloads official upstream data (Telegram networks) and the check
-data (dnsmasq-china-list, v2fly `geolocation-cn`, gaoyifan/china-operator-ip).
-It fails without writing anything when a manifest is invalid, a proxy rule
-mis-routes mainland traffic, or a sample in `tests/samples.toml` routes
-differently than expected.
+The build downloads the direct data and the reverse-check data (v2fly
+`geolocation-!cn` without `@cn` entries, Telegram, GitHub and Google
+networks). It fails without writing anything when a manifest is invalid, a
+data source cannot be downloaded or parsed, an overseas entry falls to the
+direct list, or a sample in `tests/samples.toml` routes differently than
+expected. Pass `--previous <dir>` with the previous release to also fail when
+a data source shrinks by more than half.
 
-## Add a service
+## Adjust the direct list
 
-1. Draft a manifest from v2fly, then review every rule type by hand:
+Edit `bundles/china.toml`:
 
-   ```
-   uv run quanlight import-v2fly <v2fly-file> --bundle <name> --order <n> > bundles/<name>.toml
-   ```
-
-2. Keep `host-suffix` for domains the service owns; use `host` or
-   `host-wildcard` on shared domains. `host-keyword`, `ip-asn`, broad shared
-   domains and exemptions need a `reason`.
-3. Add samples to `tests/samples.toml` and run the build.
+- `[[rule]]`: a direct entry the datasets miss, with `type`, `value`,
+  `source` (`official:<url>`, `observed` or `manual`) and a `reason`.
+- `[[exclude]]`: drop every upstream entry with this value, with a `reason`.
+- `[[keep]]`: accept reverse-check hits caused by the direct rule with this
+  value, with a `reason`.
 
 ## Licence
 

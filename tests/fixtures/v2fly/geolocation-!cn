@@ -1,0 +1,8 @@
+# foreign services
+google.com
+google.cn @cn
+full:www.google.cn
+keyword:goog
+regexp:^g\.com$
+include:telegram
+example.cn

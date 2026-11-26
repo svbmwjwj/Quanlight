@@ -5,7 +5,7 @@ from quanlight.model import Rule
 
 
 def r(type_: str, value: str) -> Rule:
-    return Rule(type=type_, value=value, role="core", source="manual")
+    return Rule(type=type_, value=value, source="manual")
 
 
 def test_suffix_boundary():

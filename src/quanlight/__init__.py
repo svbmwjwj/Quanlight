@@ -1,3 +1,3 @@
-"""从逐条审核的服务包清单构建 Quantumult X 分流列表。"""
+"""为代理托底配置构建 Quantumult X 直连列表与 APNs 列表。"""
 
 __version__ = "0.1.0"

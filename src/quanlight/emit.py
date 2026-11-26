@@ -1,31 +1,30 @@
-"""渲染 Quantumult X 分流列表与 [filter_remote] 订阅片段。"""
+"""渲染 Quantumult X 分流列表、[filter_remote] 订阅片段与探针列表。"""
 
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Sequence
 
-from .model import RULE_TYPES, Bundle, Rule
+from .model import RULE_TYPES, Rule
 
 PROXY_POLICY_PLACEHOLDER = "<proxy-policy>"
 # 规则集只在本人手动更新时拉取，-1 关闭自动同步（D-023）
 _REMOTE_OPTS = "update-interval=-1, opt-parser=false, enabled=true"
 
 
-def render_list(name: str, rules: Sequence[Rule], provenance: Mapping[str, str]) -> str:
+def render_list(name: str, rules: Sequence[Rule], header: Sequence[str]) -> str:
+    """三列格式；文件头写数据来源与上游版本，不写生成时间，内容不变时输出也不变。"""
     unique = sorted({(r.type, r.value) for r in rules}, key=lambda k: (RULE_TYPES.index(k[0]), k[1]))
-    header = [f"# quanlight {name}", f"# rules: {len(unique)}"]
-    header += [f"# source {key}: {provenance[key]}" for key in sorted(provenance)]
-    body = [f"{type_}, {value}, {name}" for type_, value in unique]
-    return "\n".join(header + body) + "\n"
+    lines = [f"# quanlight {name}", f"# rules: {len(unique)}", *header]
+    lines += [f"{type_}, {value}, {name}" for type_, value in unique]
+    return "\n".join(lines) + "\n"
 
 
-def render_filter_remote(bundles: Sequence[Bundle], base_url: str) -> str:
+def render_filter_remote(names: Sequence[str], direct: Collection[str], base_url: str) -> str:
+    """names 按订阅顺序排列；直连包 force-policy=direct，其余强制走代理。"""
     base = base_url.rstrip("/")
-    lines = [f"{base}/ios/direct-exceptions.list, tag=direct-exceptions, force-policy=direct, {_REMOTE_OPTS}"]
-    for bundle in sorted(bundles, key=lambda b: (b.order, b.name)):
-        lines.append(
-            f"{base}/ios/{bundle.name}.list, tag={bundle.name}, "
-            f"force-policy={PROXY_POLICY_PLACEHOLDER}, {_REMOTE_OPTS}"
-        )
+    lines = []
+    for name in names:
+        policy = "direct" if name in direct else PROXY_POLICY_PLACEHOLDER
+        lines.append(f"{base}/{name}.list, tag=quanlight-{name}, force-policy={policy}, {_REMOTE_OPTS}")
     lines.append("FILTER_LAN, tag=LAN, force-policy=direct, enabled=true")
     return "\n".join(lines) + "\n"
 
@@ -162,12 +161,29 @@ def mirror_bases(owner: str, repo: str) -> dict[str, str]:
     }
 
 
-def render_release_readme(bundles: Sequence[Bundle], owner: str, repo: str) -> str:
+def render_release_readme(names: Sequence[str], direct: Collection[str], owner: str, repo: str) -> str:
     bases = mirror_bases(owner, repo)
+
+    def snippet(base: str) -> list[str]:
+        return [
+            "```",
+            "[filter_remote]",
+            render_filter_remote(names, direct, base).rstrip("\n"),
+            "",
+            "[filter_local]",
+            "# personal exceptions go here",
+            f"final, {PROXY_POLICY_PLACEHOLDER}",
+            "```",
+        ]
+
     lines = [
         "# Quanlight lists",
         "",
-        f"Built from https://github.com/{owner}/{repo}. Replace `<proxy-policy>` with your own policy names.",
+        f"Built from https://github.com/{owner}/{repo}. Mainland China domains and networks connect directly;",
+        "everything else falls through to `final` and goes through your proxy.",
+        "",
+        f"Replace `{PROXY_POLICY_PLACEHOLDER}` with your own policy name. Every line needs its `force-policy`;",
+        "without it the rules point at a policy that does not exist.",
         "",
         "## Base URLs",
         "",
@@ -178,16 +194,10 @@ def render_release_readme(bundles: Sequence[Bundle], owner: str, repo: str) -> s
         "",
         "## Subscribe from GitHub",
         "",
-        "```",
-        "[filter_remote]",
-        render_filter_remote(bundles, bases["github"]).rstrip("\n"),
-        "```",
+        *snippet(bases["github"]),
         "",
         "## Subscribe from mainland China",
         "",
-        "```",
-        "[filter_remote]",
-        render_filter_remote(bundles, bases["ghfast"]).rstrip("\n"),
-        "```",
+        *snippet(bases["ghfast"]),
     ]
     return "\n".join(lines) + "\n"

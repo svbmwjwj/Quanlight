@@ -1,50 +1,39 @@
-"""上游数据（进入列表）与检查数据（不进入列表）的解析。"""
+"""直连数据源（进入列表）与反向检查数据（不进入列表）的地址与解析。"""
 
 import ipaddress
 import json
+import re
 
 from .match import IPNetwork
-from .model import Rule, normalize_host
+from .model import normalize_host
 
 TELEGRAM_CIDR_URL = "https://core.telegram.org/resources/cidr.txt"
 GITHUB_META_URL = "https://api.github.com/meta"
 GOOGLE_IPRANGES_URL = "https://www.gstatic.com/ipranges/goog.json"
+V2FLY_REPO = {
+    "repo": "v2fly/domain-list-community",
+    "branch": "master",
+    "url": "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
+}
+DNSMASQ_REPO = {
+    "repo": "felixonmars/dnsmasq-china-list",
+    "branch": "master",
+    "url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf",
+}
+CHINA_IP_REPO = {
+    "repo": "gaoyifan/china-operator-ip",
+    "branch": "ip-lists",
+    "v4": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
+    "v6": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
+}
 
-# GitHub meta 中客户端会直接访问的网段（D-022）。
-# 不收录：hooks、actions、actions_macos、importer、github_enterprise_importer 是 GitHub 主动发起连接
-# 或运行器所在的网段；codespaces 是用户虚拟机；shared_ingress 未见文档说明；pages 已被 web 覆盖。
+# 清单中 [[upstream]] 可用的 kind（D-028）。
+UPSTREAM_KINDS = ("dnsmasq-china-list", "v2fly-geolocation-cn", "china-operator-ip")
+
+# 反向检查用的 GitHub meta 键：客户端会直接访问的网段（D-022）。
 GITHUB_META_KEYS = ("web", "api", "git", "packages", "copilot")
 
-# 每次构建同步的官方数据，键为清单中 [[upstream]] 的 kind。
-UPSTREAM_KINDS: dict[str, str] = {
-    "telegram-cidr": TELEGRAM_CIDR_URL,
-    "github-meta": GITHUB_META_URL,
-    "google-ipranges": GOOGLE_IPRANGES_URL,
-}
-
-# 检查数据：只用于发现国内流量被误送代理。
-CHECK_SOURCES: dict[str, dict[str, str]] = {
-    "dnsmasq-china-list": {
-        "repo": "felixonmars/dnsmasq-china-list",
-        "branch": "master",
-        "url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf",
-    },
-    "china-operator-ip-v4": {
-        "repo": "gaoyifan/china-operator-ip",
-        "branch": "ip-lists",
-        "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-    },
-    "china-operator-ip-v6": {
-        "repo": "gaoyifan/china-operator-ip",
-        "branch": "ip-lists",
-        "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
-    },
-    "v2fly": {
-        "repo": "v2fly/domain-list-community",
-        "branch": "master",
-        "url": "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
-    },
-}
+_DNSMASQ_RE = re.compile(r"^server=/([^/]+)/[^/]*$")
 
 
 class SourceError(Exception):
@@ -66,22 +55,12 @@ def _networks(text: str, what: str) -> list[IPNetwork]:
     return nets
 
 
-def parse_telegram_cidr(text: str, bundle: str) -> list[Rule]:
-    source = f"official:{TELEGRAM_CIDR_URL}"
-    return [
-        Rule(type="ip-cidr" if n.version == 4 else "ip6-cidr", value=str(n), role="core", source=source)
-        for n in _networks(text, "telegram-cidr")
-    ]
+def parse_cidr_list(text: str, what: str = "cidr list") -> list[IPNetwork]:
+    return _networks(text, what)
 
 
-def _ip_rules(nets: list[IPNetwork], url: str) -> list[Rule]:
-    """网段转为规则，去重并保持原有顺序。"""
-    rules: dict[str, Rule] = {}
-    for n in nets:
-        rules.setdefault(
-            str(n), Rule(type="ip-cidr" if n.version == 4 else "ip6-cidr", value=str(n), role="core", source=f"official:{url}")
-        )
-    return list(rules.values())
+def parse_telegram_cidr(text: str) -> list[IPNetwork]:
+    return _networks(text, "telegram-cidr")
 
 
 def _json_object(text: str, what: str) -> dict:
@@ -101,7 +80,11 @@ def _parse_net(value: object, what: str) -> IPNetwork:
         raise SourceError(f"{what}: unparsable prefix {str(value)[:60]!r}") from exc
 
 
-def parse_github_meta(text: str, bundle: str) -> list[Rule]:
+def _unique(nets: list[IPNetwork]) -> list[IPNetwork]:
+    return list(dict.fromkeys(nets))
+
+
+def parse_github_meta(text: str) -> list[IPNetwork]:
     data = _json_object(text, "github-meta")
     nets: list[IPNetwork] = []
     for key in GITHUB_META_KEYS:
@@ -112,10 +95,10 @@ def parse_github_meta(text: str, bundle: str) -> list[Rule]:
         nets += [_parse_net(v, "github-meta") for v in values]
     if not nets:
         raise SourceError("github-meta: no networks found")
-    return _ip_rules(nets, GITHUB_META_URL)
+    return _unique(nets)
 
 
-def parse_google_ipranges(text: str, bundle: str) -> list[Rule]:
+def parse_google_ipranges(text: str) -> list[IPNetwork]:
     data = _json_object(text, "google-ipranges")
     prefixes = data.get("prefixes")
     if not isinstance(prefixes, list) or not prefixes:
@@ -126,19 +109,19 @@ def parse_google_ipranges(text: str, bundle: str) -> list[Rule]:
         if value is None:
             raise SourceError(f"google-ipranges: entry without prefix {str(entry)[:60]!r}")
         nets.append(_parse_net(value, "google-ipranges"))
-    return _ip_rules(nets, GOOGLE_IPRANGES_URL)
+    return _unique(nets)
 
 
-def parse_dnsmasq(text: str) -> set[str]:
-    domains = {
-        normalize_host(line.split("/")[1])
-        for line in text.splitlines()
-        if line.startswith("server=/") and line.count("/") >= 2
-    }
+def parse_dnsmasq(text: str) -> list[str]:
+    """解析 server=/<域名>/<DNS> 行；出现其他格式的行即视为上游格式变化。"""
+    domains: dict[str, None] = {}
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if (m := _DNSMASQ_RE.match(line)) is None:
+            raise SourceError(f"dnsmasq-china-list: unparsable line {line[:60]!r}")
+        domains.setdefault(normalize_host(m.group(1)))
     if not domains:
         raise SourceError("dnsmasq-china-list: no domains found")
-    return domains
-
-
-def parse_cidr_list(text: str) -> list[IPNetwork]:
-    return _networks(text, "cidr list")
+    return list(domains)

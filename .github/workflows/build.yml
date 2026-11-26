@@ -32,8 +32,18 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: Unit tests
         run: uv run pytest -q
+      - name: Read release branch
+        id: release
+        run: |
+          # 读不到 release 时只跳过对比与骤减检查，不阻断构建
+          if git fetch -q --depth 1 origin release:refs/remotes/origin/release; then
+            mkdir -p "$RUNNER_TEMP/release"
+            git archive refs/remotes/origin/release | tar -x -C "$RUNNER_TEMP/release"
+            echo "dir=$RUNNER_TEMP/release" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build and check lists
-        run: uv run quanlight build --out dist --owner "${{ github.repository_owner }}" --repo quanlight
+        # 上一版没有 china.list 时，构建只警告并跳过上游骤减检查
+        run: uv run quanlight build --out dist --previous "$RUNNER_TEMP/release" --owner "${{ github.repository_owner }}" --repo quanlight
       - name: Probe lists
         run: uv run quanlight probe --out dist/probe --base-url "https://ghfast.top/$BASE_URL"
       - name: Report changes against release branch
@@ -42,12 +52,10 @@ jobs:
           {
             echo "## Changes against release"
             echo
-            if ! git fetch -q --depth 1 origin release:refs/remotes/origin/release; then
+            if [ -z "${{ steps.release.outputs.dir }}" ]; then
               echo "Could not read the release branch; no comparison."
               exit 0
             fi
-            mkdir -p "$RUNNER_TEMP/release"
-            git archive refs/remotes/origin/release | tar -x -C "$RUNNER_TEMP/release"
             if git diff --no-index --quiet "$RUNNER_TEMP/release" dist; then
               echo "No content change; nothing to publish."
               exit 0

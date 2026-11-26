@@ -1,10 +1,11 @@
-from datetime import date
 from pathlib import Path
 
-from quanlight.manifest import dump_bundle, load_bundle, validate_bundle
-from quanlight.model import Bundle, Rule
+import pytest
 
-TODAY = date(2026, 11, 26)
+from quanlight.manifest import ManifestError, check_bundle_files, load_bundle, validate_bundle
+from quanlight.model import Bundle, Note, Rule
+
+HEAD = 'name = "svc"\ndescription = "d"\norder = 1\n'
 
 
 def write(tmp_path: Path, body: str) -> Path:
@@ -13,55 +14,61 @@ def write(tmp_path: Path, body: str) -> Path:
     return path
 
 
-def bundle_with(*rules: Rule) -> Bundle:
-    return Bundle(name="svc", description="test", order=10, rules=tuple(rules))
+def bundle_with(*rules: Rule, **kw) -> Bundle:
+    return Bundle(name="svc", description="test", order=10, rules=tuple(rules), **kw)
 
 
-def rule(type_: str, value: str, **kw) -> Rule:
-    return Rule(type=type_, value=value, role=kw.pop("role", "core"), source=kw.pop("source", "manual"), **kw)
+def rule(type_: str, value: str, source: str = "manual", reason: str | None = "r") -> Rule:
+    return Rule(type=type_, value=value, source=source, reason=reason)
 
 
-def test_load_normalizes_host(tmp_path):
+def test_load_full_manifest(tmp_path):
     path = write(
         tmp_path,
-        'name = "svc"\ndescription = "d"\norder = 1\n'
-        '[[rule]]\ntype = "host-suffix"\nvalue = "Telegram.ORG."\nrole = "core"\nsource = "manual"\n'
-        '[[upstream]]\nkind = "telegram-cidr"\n',
+        HEAD + '[[upstream]]\nkind = "dnsmasq-china-list"\n'
+        '[[rule]]\ntype = "host-suffix"\nvalue = "Example.CN."\nsource = "manual"\nreason = "r"\n'
+        '[[exclude]]\nvalue = "Blocked.com"\nreason = "overseas"\n'
+        '[[keep]]\nvalue = "1.0.1.0/24"\nreason = "mainland"\n',
     )
     bundle = load_bundle(path)
-    assert bundle.rules[0].value == "telegram.org"
-    assert bundle.upstream == ("telegram-cidr",)
+    assert bundle.rules == (Rule("host-suffix", "example.cn", "manual", "r"),)
+    assert bundle.upstream == ("dnsmasq-china-list",)
+    assert bundle.exclude == (Note("blocked.com", "overseas"),)
+    assert bundle.keep == (Note("1.0.1.0/24", "mainland"),)
+    assert validate_bundle(bundle) == []
 
 
-def test_validate_rejects_unknown_type():
-    errors = validate_bundle(bundle_with(rule("user-agent", "Telegram*")), TODAY)
-    assert any("user-agent" in e for e in errors)
+@pytest.mark.parametrize(
+    "body",
+    [
+        HEAD + 'uses = ["x"]\n',
+        HEAD + '[[rule]]\ntype = "host"\nvalue = "a.com"\nsource = "manual"\nrole = "core"\n',
+        HEAD + '[[rule]]\ntype = "host"\nvalue = "a.com"\nsource = "manual"\nbreadth = "broad"\n',
+        HEAD + '[[keep]]\nvalue = "a.com"\nreason = "r"\nexempt = ["b.com"]\n',
+    ],
+)
+def test_load_rejects_retired_keys(tmp_path, body):
+    with pytest.raises(ManifestError):
+        load_bundle(write(tmp_path, body))
 
 
-def test_validate_requires_reason():
-    rules = [
-        rule("host-keyword", "sift"),
-        rule("ip-asn", "399358", asn_verified="bgp.tools 2026-11-26"),
-        rule("host-suffix", "sentry.io", breadth="broad", review_by=date(2027, 1, 1)),
-        rule("host-suffix", "example.cn", exempt=("a.example.cn",)),
-    ]
-    for r in rules:
-        errors = validate_bundle(bundle_with(r), TODAY)
-        assert any("reason" in e for e in errors), r
+def test_validate_rejects_unknown_type_and_upstream():
+    assert any("ip-asn" in e for e in validate_bundle(bundle_with(rule("ip-asn", "13335"))))
+    assert any("nope" in e for e in validate_bundle(bundle_with(upstream=("nope",))))
 
 
-def test_validate_broad_requires_review_by():
-    missing = rule("host-suffix", "sentry.io", breadth="broad", reason="r")
-    assert any("review_by" in e for e in validate_bundle(bundle_with(missing), TODAY))
-    expired = rule("host-suffix", "sentry.io", breadth="broad", reason="r", review_by=date(2026, 1, 1))
-    assert any("review_by" in e for e in validate_bundle(bundle_with(expired), TODAY))
-    ok = rule("host-suffix", "sentry.io", breadth="broad", reason="r", review_by=date(2027, 1, 1))
-    assert validate_bundle(bundle_with(ok), TODAY) == []
+def test_validate_reason_rules():
+    assert any("reason" in e for e in validate_bundle(bundle_with(rule("host", "a.com", reason=None))))
+    assert any("reason" in e for e in validate_bundle(bundle_with(rule("host", "a.com", "observed", None))))
+    official = rule("host", "a.com", "official:https://example.com/doc", None)
+    assert validate_bundle(bundle_with(official)) == []
+    assert any("reason" in e for e in validate_bundle(bundle_with(rule("host-keyword", "x", "official:https://e.com", None))))
+    assert any("source" in e for e in validate_bundle(bundle_with(rule("host", "a.com", "v2fly:x"))))
 
 
-def test_validate_asn_requires_verification():
-    r = rule("ip-asn", "399358", reason="Anthropic only")
-    assert any("asn_verified" in e for e in validate_bundle(bundle_with(r), TODAY))
+def test_validate_notes_need_reason():
+    assert validate_bundle(bundle_with(exclude=(Note("a.com", ""),)))
+    assert validate_bundle(bundle_with(keep=(Note("", "r"),)))
 
 
 def test_validate_rejects_bad_values():
@@ -71,51 +78,16 @@ def test_validate_rejects_bad_values():
         rule("ip-cidr", "not-a-network"),
         rule("host-suffix", "bad host.com"),
         rule("host-suffix", "*.example.com"),
-        rule("ip-asn", "AS123", reason="r", asn_verified="x"),
     ]
     for r in bad:
-        assert validate_bundle(bundle_with(r), TODAY), r
-
-
-def test_validate_rejects_unknown_role():
-    assert validate_bundle(bundle_with(rule("host", "a.example.com", role="other")), TODAY)
-
-
-def test_dump_roundtrip(tmp_path):
-    original = Bundle(
-        name="svc",
-        description='quote " and backslash \\',
-        order=20,
-        rules=(
-            rule("host-suffix", "example.com", source="v2fly:svc"),
-            rule(
-                "host-suffix",
-                "sentry.io",
-                role="dependency",
-                breadth="broad",
-                reason="not observed yet",
-                review_by=date(2027, 2, 28),
-                exempt=("a.sentry.io",),
-            ),
-            rule("ip-asn", "399358", reason="r", asn_verified="bgp.tools 2026-11-26"),
-        ),
-        upstream=("telegram-cidr",),
-        uses=("shared-persona",),
-        v2fly_exclude=("youtube",),
-    )
-    path = write(tmp_path, dump_bundle(original))
-    assert load_bundle(path) == original
+        assert validate_bundle(bundle_with(r)), r
 
 
 def test_validate_rejects_bad_and_reserved_names():
-    for name in ("direct", "direct-exceptions", "Bad Name", "a/b", "x,y"):
-        bundle = Bundle(name=name, description="d", order=1, rules=())
-        assert validate_bundle(bundle, TODAY), name
+    for name in ("direct", "final", "Bad Name", "a/b", "x,y"):
+        assert validate_bundle(Bundle(name=name, description="d", order=1, rules=())), name
 
 
 def test_check_bundle_files_requires_name_to_match_file(tmp_path):
-    from quanlight.manifest import check_bundle_files
-
-    (tmp_path / "telegram.toml").write_text('name = "other"\ndescription = "d"\norder = 1\n')
-    errors = check_bundle_files(tmp_path)
-    assert any("telegram.toml" in e for e in errors)
+    (tmp_path / "china.toml").write_text('name = "other"\ndescription = "d"\norder = 1\n')
+    assert any("china.toml" in e for e in check_bundle_files(tmp_path))

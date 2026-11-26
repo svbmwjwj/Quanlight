@@ -1,0 +1,16 @@
+name = "china"
+description = "Mainland China domains and IP ranges, connected directly"
+order = 20
+
+# 直连数据每次构建从上游同步，不冻结进清单（D-028）。
+[[upstream]]
+kind = "dnsmasq-china-list"
+
+[[upstream]]
+kind = "v2fly-geolocation-cn"
+
+[[upstream]]
+kind = "china-operator-ip"
+
+# 上游未收录、经人工核实的直连条目写成 [[rule]]（source = "manual"、"observed" 或 "official:<网址>"）。
+# 从上游剔除的条目写成 [[exclude]]；反向检查命中但确认应直连的条目写成 [[keep]]，都须写 reason。

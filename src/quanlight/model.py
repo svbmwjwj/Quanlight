@@ -1,25 +1,26 @@
 """构建各阶段共用的核心数据类型。"""
 
 from dataclasses import dataclass
-from datetime import date
 
 HOST_TYPES = ("host", "host-suffix", "host-wildcard", "host-keyword")
-IP_TYPES = ("ip-cidr", "ip6-cidr", "ip-asn")
+IP_TYPES = ("ip-cidr", "ip6-cidr")
 RULE_TYPES = HOST_TYPES + IP_TYPES
-ROLES = ("core", "dependency", "cn-exception")
 
 
 @dataclass(frozen=True)
 class Rule:
     type: str
     value: str
-    role: str
     source: str
     reason: str | None = None
-    breadth: str | None = None
-    review_by: date | None = None
-    exempt: tuple[str, ...] = ()
-    asn_verified: str | None = None
+
+
+@dataclass(frozen=True)
+class Note:
+    """清单中的 [[exclude]] 或 [[keep]]：按值指向一条直连规则，并写明理由。"""
+
+    value: str
+    reason: str
 
 
 @dataclass(frozen=True)
@@ -29,9 +30,8 @@ class Bundle:
     order: int
     rules: tuple[Rule, ...]
     upstream: tuple[str, ...] = ()
-    uses: tuple[str, ...] = ()
-    v2fly_exclude: tuple[str, ...] = ()
-    v2fly_ignore: tuple[str, ...] = ()  # 有意不收录的上游条目
+    exclude: tuple[Note, ...] = ()
+    keep: tuple[Note, ...] = ()
 
 
 def normalize_host(value: str) -> str:
