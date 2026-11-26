@@ -18,10 +18,10 @@ def render_list(name: str, rules: Sequence[Rule], provenance: Mapping[str, str])
 
 def render_filter_remote(bundles: Sequence[Bundle], base_url: str) -> str:
     base = base_url.rstrip("/")
-    lines = [f"{base}/ios/direct-exceptions.list, tag=quanlight-direct-exceptions, force-policy=direct, {_REMOTE_OPTS}"]
+    lines = [f"{base}/ios/direct-exceptions.list, tag=direct-exceptions, force-policy=direct, {_REMOTE_OPTS}"]
     for bundle in sorted(bundles, key=lambda b: (b.order, b.name)):
         lines.append(
-            f"{base}/ios/{bundle.name}.list, tag=quanlight-{bundle.name}, "
+            f"{base}/ios/{bundle.name}.list, tag={bundle.name}, "
             f"force-policy={PROXY_POLICY_PLACEHOLDER}, {_REMOTE_OPTS}"
         )
     lines.append("FILTER_LAN, tag=LAN, force-policy=direct, enabled=true")

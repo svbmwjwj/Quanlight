@@ -39,8 +39,8 @@ policy that does not exist. End `[filter_local]` with `final, direct`.
 `templates/` holds ready-to-adapt profiles with every private value replaced by
 a `<...>` placeholder:
 
-- `templates/ios.conf`: blacklist mode on quanlight lists.
-- `templates/macos.conf`: whitelist mode; uses third-party direct lists until
+- `templates/ios_blacklist.conf`: blacklist mode on quanlight lists.
+- `templates/macos_whitelist.conf`: whitelist mode; uses third-party direct lists until
   quanlight's macOS lists exist.
 
 ## Build locally

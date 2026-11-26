@@ -59,3 +59,10 @@ def test_render_release_readme_has_both_snippets():
     assert "https://raw.githubusercontent.com/owner/quanlight/release/ios/apns.list" in text
     assert "https://ghfast.top/https://raw.githubusercontent.com/owner/quanlight/release/ios/apns.list" in text
     assert text.count("[filter_remote]") == 2
+
+
+def test_render_filter_remote_tags_have_no_project_prefix():
+    lines = render_filter_remote([Bundle("telegram", "d", 40, ())], "https://x").splitlines()
+    assert "tag=direct-exceptions," in lines[0]
+    assert "tag=telegram," in lines[1]
+    assert "quanlight-" not in "\n".join(lines)
