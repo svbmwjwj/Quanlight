@@ -1,4 +1,4 @@
-# quanlight
+# Quanlight
 
 Quantumult X filter lists built from reviewed, per-service manifests.
 
@@ -21,10 +21,10 @@ reachable and a mainland-friendly mirror otherwise; all serve the same files:
 
 | Mirror | Base URL |
 |---|---|
-| GitHub | `https://raw.githubusercontent.com/svbmwjwj/quanlight/release` |
-| Mainland China (ghfast.top, a third-party GitHub proxy) | `https://ghfast.top/https://raw.githubusercontent.com/svbmwjwj/quanlight/release` |
-| jsDelivr (Fastly) | `https://fastly.jsdelivr.net/gh/svbmwjwj/quanlight@release` |
-| jsDelivr | `https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release` |
+| GitHub | `https://raw.githubusercontent.com/svbmwjwj/Quanlight/release` |
+| Mainland China (ghfast.top, a third-party GitHub proxy) | `https://ghfast.top/https://raw.githubusercontent.com/svbmwjwj/Quanlight/release` |
+| jsDelivr (Fastly) | `https://fastly.jsdelivr.net/gh/svbmwjwj/Quanlight@release` |
+| jsDelivr | `https://cdn.jsdelivr.net/gh/svbmwjwj/Quanlight@release` |
 
 Append `/ios/<name>.list` to a base URL. A third-party proxy can see and
 alter what it serves; prefer GitHub or jsDelivr when they work for you.

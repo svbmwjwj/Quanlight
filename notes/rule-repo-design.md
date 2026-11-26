@@ -7,7 +7,7 @@ updated: 2026-11-26
 
 ## 背景与目标
 
-本项目建一个自己的 Quantumult X 分流规则库，命名为 `quanlight`，取红绿灯的信号灯与圈 X 的 Quan 组合而成（用户，D-001）。此前直接订阅他人加工的列表，遇到三个问题：规则类型选得过宽，会误伤其他流量；直连与代理的冲突只能靠订阅顺序间接处理；上游的取舍与本人需求不一致时会悄悄影响分流。
+本项目建一个自己的 Quantumult X 分流规则库，命名为 Quanlight，取红绿灯的信号灯与圈 X 的 Quan 组合而成（用户，D-001）。GitHub 仓库名首字母大写，为 `Quanlight`；本地目录、本机数据目录与 Python 包名保持小写 `quanlight`（用户：仓库名大写；其余 Claude，D-017）。此前直接订阅他人加工的列表，遇到三个问题：规则类型选得过宽，会误伤其他流量；直连与代理的冲突只能靠订阅顺序间接处理；上游的取舍与本人需求不一致时会悄悄影响分流。
 
 两类设备的需求不同，分成两套配置（用户，D-007）：
 
@@ -261,7 +261,7 @@ final, direct
 ## 发布与订阅
 
 - 分支：`main` 放清单、源码与测试；`release` 只放产物，每次构建强制覆盖为单个提交（Claude）。
-- 订阅地址：GitHub `https://raw.githubusercontent.com/svbmwjwj/quanlight/release/<文件>` 为主（Claude，D-015）。
+- 订阅地址：GitHub `https://raw.githubusercontent.com/svbmwjwj/Quanlight/release/<文件>` 为主（Claude，D-015）。
 - 境内备用：`ghfast.top` 代理的 GitHub 地址，实测在大陆网络下可直连；jsDelivr 的 `fastly`、`cdn` 两个节点也列出，能否稳定直连待真机确认（用户：须有境内可用的备用链接；具体地址 Claude，D-015）。第三方代理能看到并改动所转发的内容，这是已知风险。
 - 发布说明同时给出 GitHub 版与境内版的 `[filter_remote]` 片段（Claude，D-015）。
 - 个人配置直接订阅本仓库发布的列表，不再订阅他人加工的列表；第 2 阶段的服务包建成前，尚未覆盖的服务暂时保留原有订阅（用户：直接引用自己的规则集；过渡安排 Claude，D-014）。

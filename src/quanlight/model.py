@@ -1,4 +1,4 @@
-"""Core data types shared by every stage of the build."""
+"""构建各阶段共用的核心数据类型。"""
 
 from dataclasses import dataclass
 from datetime import date
@@ -31,9 +31,9 @@ class Bundle:
     upstream: tuple[str, ...] = ()
     uses: tuple[str, ...] = ()
     v2fly_exclude: tuple[str, ...] = ()
-    v2fly_ignore: tuple[str, ...] = ()  # upstream values deliberately left out of the bundle
+    v2fly_ignore: tuple[str, ...] = ()  # 有意不收录的上游条目
 
 
 def normalize_host(value: str) -> str:
-    """Lowercase a host name and drop a trailing root dot."""
+    """主机名转小写，并去掉末尾的根点。"""
     return value.strip().lower().rstrip(".")

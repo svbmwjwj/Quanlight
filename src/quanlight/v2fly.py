@@ -1,6 +1,6 @@
-"""Expand v2fly/domain-list-community data and map it to Quantumult X rules.
+"""展开 v2fly/domain-list-community 数据，并映射为 Quantumult X 规则。
 
-Spec: https://github.com/v2fly/domain-list-community#structure-of-data
+数据格式见 https://github.com/v2fly/domain-list-community#structure-of-data
 """
 
 from collections.abc import Iterable
@@ -16,7 +16,7 @@ class V2flyError(Exception):
 
 @dataclass(frozen=True)
 class Entry:
-    kind: str  # domain / full / keyword / regexp
+    kind: str  # domain、full、keyword 或 regexp
     value: str
     attrs: frozenset[str]
     file: str
@@ -33,7 +33,7 @@ def _parse_line(line: str) -> tuple[str, list[str]] | None:
     if not line:
         return None
     head, *rest = line.split()
-    return head, [t for t in rest if t.startswith("@")]  # "&affiliation" tokens are dropped
+    return head, [t for t in rest if t.startswith("@")]  # 丢弃 "&affiliation" 标记
 
 
 def expand(data_dir: Path, name: str, exclude: Iterable[str] = ()) -> list[Entry]:
@@ -57,7 +57,7 @@ def expand(data_dir: Path, name: str, exclude: Iterable[str] = ()) -> list[Entry
                     continue
                 want = frozenset(t[1:] for t in attr_tokens if not t.startswith("@-"))
                 deny = frozenset(t[2:] for t in attr_tokens if t.startswith("@-"))
-                # The filter applies to the fully expanded include, nested files included.
+                # 属性过滤作用于完整展开后的结果，包括嵌套引用的文件。
                 out += [e for e in walk(target, stack + (current,)) if want <= e.attrs and not e.attrs & deny]
                 continue
             kind, _, value = head.partition(":") if ":" in head else ("domain", "", head)
@@ -95,7 +95,7 @@ def to_rules(entries: Iterable[Entry], source: str) -> ImportResult:
 
 
 def diff(bundle: Bundle, imported: ImportResult) -> tuple[list[Rule], list[Rule]]:
-    """Return (rules upstream added, v2fly-sourced rules upstream no longer has)."""
+    """返回（上游新增的规则，清单中有而上游已删除的 v2fly 规则）。"""
     ignored = set(bundle.v2fly_ignore)
     upstream = {(r.type, r.value): r for r in imported.rules if r.value not in ignored}
     current = {(r.type, r.value): r for r in bundle.rules if r.source.startswith("v2fly:")}

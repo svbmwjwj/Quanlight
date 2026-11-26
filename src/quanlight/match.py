@@ -1,7 +1,7 @@
-"""Single-rule matching and ordered routing that models Quantumult X.
+"""单条规则匹配，以及模拟 Quantumult X 的按顺序路由。
 
-The routing model (host rules of every list first, then IP rules, then the
-final policy) is provisional until the on-device probe confirms it.
+路由模型（先按顺序匹配所有列表的主机规则，再匹配 IP 规则，最后落到 final）
+是暂定的，待真机探针验证后再确认。
 """
 
 import ipaddress

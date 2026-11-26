@@ -1,4 +1,4 @@
-"""Command line entry point: build, import-v2fly, diff-v2fly and probe."""
+"""命令行入口：build、import-v2fly、diff-v2fly 与 probe。"""
 
 import argparse
 import dataclasses
@@ -29,9 +29,9 @@ from .sources import (
 )
 from .v2fly import diff, expand, to_rules
 
-OUTPUT_MARKER = ".quanlight-dist"  # marks a directory this tool may replace
+OUTPUT_MARKER = ".quanlight-dist"  # 标记本工具可以整体替换的输出目录
 DEFAULT_OWNER = "svbmwjwj"
-DEFAULT_REPO = "quanlight"
+DEFAULT_REPO = "Quanlight"
 DEFAULT_BASE_URL = f"https://raw.githubusercontent.com/{DEFAULT_OWNER}/{DEFAULT_REPO}/release"
 UPSTREAM_PARSERS: dict[str, Callable[[str, str], list[Rule]]] = {"telegram-cidr": parse_telegram_cidr}
 

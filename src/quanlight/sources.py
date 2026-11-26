@@ -1,4 +1,4 @@
-"""Parsers for upstream data (bundled into lists) and check data (never bundled)."""
+"""上游数据（进入列表）与检查数据（不进入列表）的解析。"""
 
 import ipaddress
 
@@ -7,10 +7,10 @@ from .model import Rule, normalize_host
 
 TELEGRAM_CIDR_URL = "https://core.telegram.org/resources/cidr.txt"
 
-# Official data synced on every build, keyed by the manifest's [[upstream]] kind.
+# 每次构建同步的官方数据，键为清单中 [[upstream]] 的 kind。
 UPSTREAM_KINDS: dict[str, str] = {"telegram-cidr": TELEGRAM_CIDR_URL}
 
-# Check data: used only to detect mis-routing of mainland China traffic.
+# 检查数据：只用于发现国内流量被误送代理。
 CHECK_SOURCES: dict[str, dict[str, str]] = {
     "dnsmasq-china-list": {
         "repo": "felixonmars/dnsmasq-china-list",

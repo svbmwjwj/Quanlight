@@ -2,7 +2,7 @@ name: upstream-diff
 
 on:
   schedule:
-    - cron: "0 1 * * 1" # Monday 09:00 Beijing time
+    - cron: "0 1 * * 1" # 北京时间周一 09:00
   workflow_dispatch:
 
 permissions:

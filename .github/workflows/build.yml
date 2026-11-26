@@ -2,7 +2,7 @@ name: build
 
 on:
   schedule:
-    - cron: "0 18 * * *" # 02:00 Beijing time
+    - cron: "0 18 * * *" # 北京时间 02:00
   push:
     branches: [main]
   workflow_dispatch:

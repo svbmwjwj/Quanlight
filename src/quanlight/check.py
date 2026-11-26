@@ -1,4 +1,4 @@
-"""Direct exceptions, mis-routing (misfire) detection and cross-bundle checks."""
+"""直连例外、误伤检查与服务包之间的交叉检查。"""
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
@@ -15,7 +15,7 @@ def proxy_rules(bundle: Bundle) -> list[Rule]:
 
 
 def direct_exceptions(bundles: Sequence[Bundle]) -> list[Rule]:
-    """cn-exception rules whose value some proxy host rule would otherwise capture."""
+    """会被某条代理主机规则命中的 cn-exception 条目，需要生成直连例外。"""
     proxies = [rule for bundle in bundles for rule in proxy_rules(bundle) if rule.type in HOST_TYPES]
     found: dict[tuple[str, str], Rule] = {}
     for bundle in bundles:
@@ -43,7 +43,7 @@ class Misfire:
 
 
 class _HostIndex:
-    """Host rules of one list, indexed so lookups cost O(labels), not O(rules)."""
+    """单个列表的主机规则索引，查询开销与域名层级数相关，而不是与规则数相关。"""
 
     def __init__(self, rules: Iterable[Rule]):
         self.exact: dict[str, Rule] = {}
@@ -87,12 +87,12 @@ def _parent_in(host: str, domains: set[str]) -> str | None:
     return None
 
 
-# A label no real service uses, to stand for "any subdomain" of a mainland domain.
+# 真实服务不会使用的标签，用来代表国内域名的“任意子域”。
 _ANY_LABEL = "zz9-quanlight-any"
 
 
 def _literal_tail(rule: Rule) -> str | None:
-    """Host part a rule targets, for host, suffix and wildcard rules."""
+    """规则指向的主机部分，适用于 host、host-suffix 与 host-wildcard。"""
     if rule.type in ("host", "host-suffix"):
         return rule.value
     if rule.type == "host-wildcard":
@@ -113,12 +113,12 @@ def find_misfires(
             return
         found.setdefault((rule_list.name, rule.type, rule.value, target), Misfire(rule_list.name, rule, target))
 
-    # A mainland domain and its subdomains must route direct.
+    # 国内域名及其子域都必须落到直连。
     for domain in domains:
         for host in (domain, f"{_ANY_LABEL}.{domain}"):
             if (hit := _first_match(indexed, host)) is not None:
                 record(hit[0], hit[1], domain)
-    # A proxy rule must not target a host that lies under a mainland domain.
+    # 代理规则不能指向国内域名之下的主机。
     for rule_list, _ in indexed:
         for rule in rule_list.rules:
             tail = _literal_tail(rule)
@@ -128,7 +128,7 @@ def find_misfires(
             hit = _first_match(indexed, probe)
             if hit is not None and hit[0].policy != "direct":
                 record(rule_list, rule, parent)
-    # Proxy networks must not overlap mainland networks.
+    # 代理网段不能与大陆网段重叠。
     networks = list(cn_networks)
     for rule_list in lists:
         for rule in rule_list.rules:

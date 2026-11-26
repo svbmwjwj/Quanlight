@@ -1,4 +1,4 @@
-"""Render Quantumult X filter lists and the [filter_remote] subscription snippet."""
+"""渲染 Quantumult X 分流列表与 [filter_remote] 订阅片段。"""
 
 from collections.abc import Mapping, Sequence
 
@@ -28,9 +28,9 @@ def render_filter_remote(bundles: Sequence[Bundle], base_url: str) -> str:
     return "\n".join(lines) + "\n"
 
 
-# On-device probes for the rule-matching questions the design leaves open.
-# Each case: remote lists as (type, value, policy) in subscription order,
-# an optional [filter_local] line, and the hosts to open in Safari.
+# 真机探针：验证设计中尚未确定的匹配语义。
+# 每个用例包含：按订阅顺序排列的远程列表 (类型, 值, 策略)、
+# 可选的 [filter_local] 规则，以及要在 Safari 中打开的主机。
 PROBE_CASES: dict[str, tuple[list[tuple[str, str, str]], str | None, list[str]]] = {
     "order": (
         [("host-suffix", "example.com", "reject"), ("host-suffix", "example.com", "direct")],
@@ -77,7 +77,7 @@ def render_probe(case: str, base_url: str) -> dict[str, str]:
 
 
 def mirror_bases(owner: str, repo: str) -> dict[str, str]:
-    """Base URLs of the release branch: GitHub itself plus mainland-friendly mirrors."""
+    """发布分支的基础地址：GitHub 本身与境内可用的镜像。"""
     raw = f"https://raw.githubusercontent.com/{owner}/{repo}/release"
     return {
         "github": raw,
@@ -90,7 +90,7 @@ def mirror_bases(owner: str, repo: str) -> dict[str, str]:
 def render_release_readme(bundles: Sequence[Bundle], owner: str, repo: str) -> str:
     bases = mirror_bases(owner, repo)
     lines = [
-        "# quanlight lists",
+        "# Quanlight lists",
         "",
         f"Built from https://github.com/{owner}/{repo}. Replace `<proxy-policy>` with your own policy names.",
         "",

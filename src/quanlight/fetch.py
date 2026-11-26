@@ -1,4 +1,4 @@
-"""Network access: plain downloads, upstream commit ids and the v2fly data tarball."""
+"""网络访问：普通下载、上游提交哈希与 v2fly 数据压缩包。"""
 
 import io
 import json
@@ -26,7 +26,7 @@ def fetch_bytes(url: str, retries: int = 3, headers: dict[str, str] | None = Non
     for attempt in range(retries):
         try:
             return _request(url, headers)
-        except OSError as exc:  # URLError and HTTPError are OSError subclasses
+        except OSError as exc:  # URLError 与 HTTPError 都是 OSError 的子类
             last = exc
             time.sleep(2**attempt)
     raise FetchError(f"failed to fetch {url}: {last}")
@@ -45,7 +45,7 @@ def fetch_commit(repo: str, branch: str) -> str:
 
 
 def fetch_v2fly_data(dest: Path, url: str) -> Path:
-    """Download and unpack the v2fly repository; return its data/ directory."""
+    """下载并解压 v2fly 仓库，返回其中的 data/ 目录。"""
     dest.mkdir(parents=True, exist_ok=True)
     with tarfile.open(fileobj=io.BytesIO(fetch_bytes(url)), mode="r:gz") as tar:
         tar.extractall(dest, filter="data")

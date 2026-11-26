@@ -1,4 +1,4 @@
-"""Read, validate and write service bundle manifests (TOML)."""
+"""读取、校验与写出服务包清单（TOML）。"""
 
 import ipaddress
 import json
@@ -12,7 +12,7 @@ from .model import HOST_TYPES, ROLES, RULE_TYPES, Bundle, Rule, normalize_host
 _HOST_RE = re.compile(r"^[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?(\.[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?)*$")
 _WILDCARD_RE = re.compile(r"^[a-z0-9_.*?-]+$")
 _NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-# Names the build uses for its own lists and policies.
+# 构建自身的列表与策略占用的名字。
 RESERVED_NAMES = frozenset({"direct", "direct-exceptions", "reject", "proxy"})
 
 
@@ -51,7 +51,7 @@ def load_bundle(path: Path) -> Bundle:
 
 
 def check_bundle_files(directory: Path) -> list[str]:
-    """Each manifest's name must equal its file stem, which also keeps names unique."""
+    """清单的 name 必须与文件名一致，同时保证包名不重复。"""
     errors = []
     for path in sorted(directory.glob("*.toml")):
         with path.open("rb") as fh:

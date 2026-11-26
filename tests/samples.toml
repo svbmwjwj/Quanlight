@@ -1,4 +1,4 @@
-# Expected routing for the published iOS lists: "direct" or a bundle name.
+# 发布的 iOS 列表的期望去向："direct" 或包名。
 
 [[sample]]
 host = "courier.push.apple.com"
