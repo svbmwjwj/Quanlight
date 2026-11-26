@@ -5595,3 +5595,6 @@ type = "host"
 value = "www.pxcc.com"
 role = "cn-exception"
 source = "v2fly:google"
+
+[[upstream]]
+kind = "google-ipranges"

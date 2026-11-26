@@ -32,15 +32,21 @@ def fetch_bytes(url: str, retries: int = 3, headers: dict[str, str] | None = Non
     raise FetchError(f"failed to fetch {url}: {last}")
 
 
-def fetch_text(url: str, retries: int = 3) -> str:
-    return fetch_bytes(url, retries).decode("utf-8")
-
-
-def fetch_commit(repo: str, branch: str) -> str:
+def _github_api_headers() -> dict[str, str]:
+    """GitHub API 请求头；有 GITHUB_TOKEN 时带上，避免共享出口 IP 的匿名限流。"""
     headers = {"Accept": "application/vnd.github+json"}
     if token := os.environ.get("GITHUB_TOKEN"):
         headers["Authorization"] = f"Bearer {token}"
-    data = json.loads(fetch_bytes(f"https://api.github.com/repos/{repo}/commits/{branch}", headers=headers))
+    return headers
+
+
+def fetch_text(url: str, retries: int = 3) -> str:
+    headers = _github_api_headers() if url.startswith("https://api.github.com/") else None
+    return fetch_bytes(url, retries, headers).decode("utf-8")
+
+
+def fetch_commit(repo: str, branch: str) -> str:
+    data = json.loads(fetch_bytes(f"https://api.github.com/repos/{repo}/commits/{branch}", headers=_github_api_headers()))
     return data["sha"]
 
 
