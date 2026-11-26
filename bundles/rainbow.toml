@@ -1,9 +1,0 @@
-name = "rainbow"
-description = "Rainbow wallet"
-order = 30
-
-[[rule]]
-type = "host-suffix"
-value = "rainbow.me"
-role = "core"
-source = "legacy:ios"

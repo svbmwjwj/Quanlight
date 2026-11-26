@@ -170,14 +170,14 @@ v2fly 条目的导入映射（Claude）：
 ### 服务包
 
 - `apns`：Apple 推送服务，单独成包，不与任何应用绑定（用户，D-008）。所有应用的推送都会经过它，节点中断时全部推送一起中断，这是已接受的取舍（用户）。
-- 首批服务包一个产品一个包，便于分别指定策略（用户：服务范围；拆分粒度 Claude，D-012）：
+- 首批服务包（用户：服务范围，D-012；拆分粒度见下，D-018）：
   - `google`：含 Gmail、Google Play；不含 YouTube（用户，D-012）。
   - `youtube`：单独成包（用户，D-012）。
   - `telegram`、`twitter`、`github`、`linkedin`：沿用旧 `iOS.conf` 中已启用订阅的范围（用户，D-012）。
   - `claude`：尽可能完整，以 macOS 配置中整理的 Claude 规则为起点，补充 v2fly `anthropic` 文件（用户，D-012）。
-  - `rainbow`、`phantom`、`kraken`：两个钱包与一个交易所（用户，D-012；选择依据见私密笔记）。
-  - `uniswap`、`etherscan`、`hyperliquid`、`arweave`、`ipfs`：旧配置中手写的链上服务（用户，D-012）。
+  - `crypto`：Rainbow、Phantom、Kraken、Uniswap、Etherscan、Hyperliquid、Arweave、IPFS 与它们共用的 WalletConnect 中继合并为一个包（用户，D-018；选择依据见私密笔记）。
   - 币安不收录（用户，D-012；原因见私密笔记）。
+- 拆分粒度：同一类、通常走同一策略的服务合并为一个包；需要单独指定策略或单独开关的产品才独立成包（用户提出，Claude 理解为此规则，D-018）。
 
 首批服务包以已有规则与公开资料起步，暂不做真机观测；某个服务出现漏判，或需要收窄 `broad` 条目时，再用真机配合 WebDriverAgent 观测（Claude）。
 

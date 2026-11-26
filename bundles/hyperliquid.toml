@@ -1,9 +1,0 @@
-name = "hyperliquid"
-description = "Hyperliquid exchange"
-order = 35
-
-[[rule]]
-type = "host-suffix"
-value = "hyperliquid.xyz"
-role = "core"
-source = "legacy:ios"

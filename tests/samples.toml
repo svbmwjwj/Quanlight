@@ -114,35 +114,35 @@ expect = "direct"
 
 [[sample]]
 host = "rainbow.me"
-expect = "rainbow"
+expect = "crypto"
 
 [[sample]]
 host = "phantom.app"
-expect = "phantom"
+expect = "crypto"
 
 [[sample]]
 host = "www.kraken.com"
-expect = "kraken"
+expect = "crypto"
 
 [[sample]]
 host = "app.uniswap.org"
-expect = "uniswap"
+expect = "crypto"
 
 [[sample]]
 host = "etherscan.io"
-expect = "etherscan"
+expect = "crypto"
 
 [[sample]]
 host = "app.hyperliquid.xyz"
-expect = "hyperliquid"
+expect = "crypto"
 
 [[sample]]
 host = "abc.arweave.net"
-expect = "arweave"
+expect = "crypto"
 
 [[sample]]
 host = "ipfs.io"
-expect = "ipfs"
+expect = "crypto"
 
 [[sample]]
 host = "www.binance.com"
@@ -162,8 +162,8 @@ expect = "direct"
 
 [[sample]]
 host = "phantom.com"
-expect = "phantom"
+expect = "crypto"
 
 [[sample]]
 host = "relay.walletconnect.com"
-expect = "shared-walletconnect"
+expect = "crypto"

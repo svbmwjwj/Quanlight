@@ -1,9 +1,0 @@
-name = "ipfs"
-description = "IPFS public gateway"
-order = 37
-
-[[rule]]
-type = "host-suffix"
-value = "ipfs.io"
-role = "core"
-source = "legacy:ios"

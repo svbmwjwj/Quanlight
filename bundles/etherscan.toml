@@ -1,9 +1,0 @@
-name = "etherscan"
-description = "Etherscan block explorer"
-order = 34
-
-[[rule]]
-type = "host-suffix"
-value = "etherscan.io"
-role = "core"
-source = "legacy:ios"
