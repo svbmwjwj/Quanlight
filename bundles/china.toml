@@ -57,9 +57,19 @@ kind = "v2fly"
 file = "didi"
 apps = "DiDi"
 
-# iCloud 中国区与 App Store。
+# Apple 服务除推送（APNs）外全部直连；APNs 由排在最前的 apns 列表强制走代理。
+# v2fly 把其中不少 Apple 域名归为境外，这是本人有意直连，整源豁免反向检查。
+[[upstream]]
+kind = "v2fly"
+file = "apple"
+apps = "Apple services except APNs"
+allow_foreign = true
+reason = "Apple services except APNs connect directly by owner decision; APNs stays in the apns list"
+
 [[upstream]]
 kind = "dnsmasq-apple-china"
+allow_foreign = true
+reason = "Apple services except APNs connect directly by owner decision; APNs stays in the apns list"
 
 # 其余国内流量的 IP 回退（D-006）。
 [[upstream]]
@@ -96,3 +106,12 @@ reason = "parent of overseas Tencent Cloud regions; mainland regions fall back t
 [[exclude]]
 value = "tencentcos.com.cn"
 reason = "parent of overseas Tencent Cloud regions; mainland regions fall back to China IP ranges"
+
+# v2fly apple 以 full: 收录这两个推送主机，生成的 host 规则会先于 APNs 的 host-suffix 命中（D-019）。
+[[exclude]]
+value = "init-p01st.push.apple.com"
+reason = "APNs host; must reach the apns list instead of direct"
+
+[[exclude]]
+value = "init-s01st.push.apple.com"
+reason = "APNs host; must reach the apns list instead of direct"

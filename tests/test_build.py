@@ -177,3 +177,14 @@ def test_build_reports_dropped_suffixes(tmp_path):
     assert report.redundant == {"china": 1}
     assert "www.taobao.com" not in (args["out_dir"] / "china.list").read_text()
     assert "dropped 1 host-suffix" in report.to_markdown()
+
+
+def test_allow_foreign_upstream_skips_reverse_check(tmp_path):
+    extra_upstream = '[[upstream]]\nkind = "dnsmasq-apple-china"\nallow_foreign = true\nreason = "intended"\n'
+    args = setup(tmp_path, dnsmasq=("taobao.com", "t.me"))
+    china = args["bundles_dir"] / "china.toml"
+    china.write_text(china.read_text().replace('[[upstream]]\nkind = "dnsmasq-apple-china"\n', extra_upstream))
+    report = build(**args)
+    assert report.errors == []
+    assert [h.target for h in report.allowed] == ["t.me"]
+    assert "allowed: 1" in report.to_markdown()

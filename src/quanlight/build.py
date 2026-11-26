@@ -63,6 +63,7 @@ class BuildReport:
     redundant: dict[str, int] = field(default_factory=dict)  # 列表 -> 去掉的冗余后缀条数
     hits: list[Hit] = field(default_factory=list)  # 未被 [[keep]] 豁免的命中
     kept: list[Hit] = field(default_factory=list)
+    allowed: list[Hit] = field(default_factory=list)  # 来自 allow_foreign 数据源的命中
 
     def to_markdown(self) -> str:
         lines = ["## quanlight build", "", f"Result: {'FAILED' if self.errors else 'OK'}", ""]
@@ -87,7 +88,7 @@ class BuildReport:
         if self.check_versions:
             lines += ["### Reverse check", ""]
             lines += [f"- {k}: {v}" for k, v in sorted(self.check_versions.items())]
-            lines += [f"- hits: {len(self.hits)}, kept: {len(self.kept)}", ""]
+            lines += [f"- hits: {len(self.hits)}, kept: {len(self.kept)}, allowed: {len(self.allowed)}", ""]
         if self.hits:
             by_rule = Counter((h.rule.type, h.rule.value, h.rule.source) for h in self.hits)
             lines += ["| direct rule | source | foreign entries |", "|---|---|---|"]
@@ -178,7 +179,12 @@ def _reverse_check(router: Router, bundles: Sequence[Bundle], data: CheckData, r
     direct = [lst for lst in router.lists if lst.policy == DIRECT]
     hits = domain_hits(router, data.domains)
     hits += network_hits([r for lst in direct for r in lst.rules], data.networks)
-    keep = {n.value for b in bundles if b.name in DIRECT_BUNDLES for n in b.keep}
+    direct_bundles = [b for b in bundles if b.name in DIRECT_BUNDLES]
+    # 上游规则的 source 即数据源的 key；allow_foreign 的数据源整体豁免
+    allowed = {spec.key for b in direct_bundles for spec in b.upstream if spec.allow_foreign}
+    report.allowed = [h for h in hits if h.rule.source in allowed]
+    hits = [h for h in hits if h.rule.source not in allowed]
+    keep = {n.value for b in direct_bundles for n in b.keep}
     report.kept = [h for h in hits if h.rule.value in keep]
     report.hits = [h for h in hits if h.rule.value not in keep]
     report.check_versions = dict(data.provenance)

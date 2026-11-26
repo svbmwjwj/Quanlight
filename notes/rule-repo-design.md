@@ -127,6 +127,7 @@ reason = "..."
 - `[[keep]]`：反向检查的豁免，须写 `reason`。
 - `[[upstream]]`：`kind = "v2fly"` 时 `file` 与 `apps` 必填，`apps` 写这个文件服务于哪些常用应用。
 - `skip_includes`：`kind = "v2fly"` 时可选，列出展开时跳过的 include 子文件，用于剔除只服务境外的国际站与海外业务；所列文件须确实被引用（用户：不要国际站；字段 Claude）。
+- `allow_foreign`：可选，设为 `true` 时这个数据源的规则整体不参与反向检查，须同时写 `reason`；用于本人有意直连、但检查数据把它列为境外的数据源（用户：Apple 除推送外直连；字段 Claude）。
 - 包级 `order` 决定订阅顺序。
 
 ## 直连数据
@@ -144,7 +145,7 @@ reason = "..."
 | 中国银行、招商银行 | v2fly `boc`、`cmb` |
 | 京东、美团、抖音、滴滴 | v2fly `jd`、`meituan`、`douyin`、`didi` |
 | 12306 与其他 .cn 站点 | 手写 `host-suffix, cn` |
-| iCloud 中国区、App Store | dnsmasq-china-list `apple.china.conf` |
+| Apple 服务（推送除外） | v2fly `apple`、dnsmasq-china-list `apple.china.conf` |
 | 其余国内流量 | gaoyifan/china-operator-ip 大陆网段（D-006） |
 
 - v2fly 文件按下表映射；多个文件重复的条目去重（Claude）。

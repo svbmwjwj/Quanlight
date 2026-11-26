@@ -19,7 +19,7 @@ _MANUAL_SOURCES = ("observed", "manual")
 _BUNDLE_KEYS = {"name", "description", "order", "rule", "upstream", "exclude", "keep"}
 _RULE_KEYS = {"type", "value", "source", "reason"}
 _NOTE_KEYS = {"value", "reason"}
-_UPSTREAM_KEYS = {"kind", "file", "apps", "skip_includes"}
+_UPSTREAM_KEYS = {"kind", "file", "apps", "skip_includes", "allow_foreign", "reason"}
 
 
 class ManifestError(Exception):
@@ -59,6 +59,8 @@ def _upstream_from_table(table: dict, where: str) -> UpstreamSpec:
         file=table.get("file"),
         apps=table.get("apps"),
         skip_includes=tuple(table.get("skip_includes", ())),
+        allow_foreign=table.get("allow_foreign", False),
+        reason=table.get("reason"),
     )
 
 
@@ -119,6 +121,8 @@ def validate_bundle(bundle: Bundle) -> list[str]:
     for key in sorted({k for k in keys if keys.count(k) > 1}):
         errors.append(f"{bundle.name}: duplicate upstream {key}")
     for spec in bundle.upstream:
+        if spec.allow_foreign is not False and not (spec.allow_foreign is True and spec.reason):
+            errors.append(f"{bundle.name}: {spec.key}: allow_foreign must be true with a reason")
         if spec.kind not in UPSTREAM_KINDS:
             errors.append(f"{bundle.name}: unknown upstream kind {spec.kind!r}")
         elif spec.kind == "v2fly" and not (spec.file and spec.apps):

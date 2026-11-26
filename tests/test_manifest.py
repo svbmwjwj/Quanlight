@@ -68,6 +68,9 @@ def test_validate_upstream_fields():
     assert any("takes no file" in e for e in errs(UpstreamSpec("china-operator-ip", skip_includes=("x",))))
     assert any("duplicate" in e for e in errs(UpstreamSpec("v2fly", "jd", "JD"), UpstreamSpec("v2fly", "jd", "JD")))
     assert errs(UpstreamSpec("v2fly", "jd", "JD"), UpstreamSpec("china-operator-ip")) == []
+    assert any("allow_foreign" in e for e in errs(UpstreamSpec("v2fly", "apple", "Apple", allow_foreign=True)))
+    assert any("allow_foreign" in e for e in errs(UpstreamSpec("v2fly", "apple", "Apple", allow_foreign="yes", reason="r")))
+    assert errs(UpstreamSpec("v2fly", "apple", "Apple", allow_foreign=True, reason="intended")) == []
 
 
 def test_validate_reason_rules():

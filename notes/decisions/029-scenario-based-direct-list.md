@@ -18,7 +18,7 @@ doc: notes/rule-repo-design.md
 - 常用应用（用户）：微信、QQ、小红书、支付宝、云闪付、中国银行、招商银行、淘宝、京东、美团、抖音、滴滴、12306、iCloud 中国区、App Store（直连）。
 - 每个应用取 v2fly 对应的公司或服务文件，不手写域名（Claude）：`tencent`（微信、QQ）、`xiaohongshu`、`alibaba`（支付宝、淘宝）、`unionpay`（云闪付）、`boc`、`cmb`、`jd`、`meituan`、`douyin`、`didi`。
 - `host-suffix, cn` 一条覆盖全部 .cn 域名，12306 的 `12306.cn` 由它覆盖（Claude）。
-- iCloud 中国区与 App Store 取 dnsmasq-china-list 的 `apple.china.conf`，它收录的是在大陆有节点、应走境内解析的 Apple 域名（Claude）。
+- Apple 服务除推送（APNs）外全部直连，取 v2fly `apple`（连同其 include）与 dnsmasq-china-list 的 `apple.china.conf`（用户：Apple 除推送外直连；数据源 Claude）。
 - 大陆网段 gaoyifan/china-operator-ip 照旧作为 IP 回退（D-006）。
 
 ## 被推翻的原判断

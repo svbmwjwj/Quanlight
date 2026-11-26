@@ -31,6 +31,8 @@ class UpstreamSpec:
     file: str | None = None
     apps: str | None = None
     skip_includes: tuple[str, ...] = ()  # 展开时跳过的 include 子文件
+    allow_foreign: bool = False  # 本人有意直连：这个数据源的规则不参与反向检查
+    reason: str | None = None  # allow_foreign 的理由
 
     @property
     def key(self) -> str:
