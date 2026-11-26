@@ -1,0 +1,6 @@
+.DS_Store
+.env
+*.env
+# Official Quantumult X sample kept locally for reference; third-party file, not redistributed
+sample.conf
+.superpowers/
