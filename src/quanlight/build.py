@@ -60,6 +60,7 @@ class BuildReport:
     sources: dict[str, SourceStats] = field(default_factory=dict)
     skipped: dict[str, list[str]] = field(default_factory=dict)
     check_versions: dict[str, str] = field(default_factory=dict)
+    redundant: dict[str, int] = field(default_factory=dict)  # 列表 -> 去掉的冗余后缀条数
     hits: list[Hit] = field(default_factory=list)  # 未被 [[keep]] 豁免的命中
     kept: list[Hit] = field(default_factory=list)
 
@@ -75,11 +76,13 @@ class BuildReport:
         if self.sources:
             lines += ["### Direct data", "", "| source | version | entries | added |", "|---|---|---|---|"]
             lines += [f"| {k} | {s.version} | {s.entries} | {s.added} |" for k, s in self.sources.items()] + [""]
+        for name, n in self.redundant.items():
+            lines.append(f"- {name}: dropped {n} host-suffix rules covered by a shorter suffix")
         for reason, values in sorted(self.skipped.items()):
             lines.append(f"- not imported ({reason}): {len(values)}")
             if reason == "keyword":
                 lines += [f"  - `{v}`" for v in values]
-        if self.skipped:
+        if self.skipped or self.redundant:
             lines.append("")
         if self.check_versions:
             lines += ["### Reverse check", ""]
@@ -145,6 +148,21 @@ def _merge(bundle: Bundle, upstream: Mapping[str, Upstream], report: BuildReport
     return dataclasses.replace(bundle, rules=tuple(rules)), header
 
 
+def drop_covered(rules: Sequence[Rule]) -> tuple[list[Rule], int]:
+    """去掉被同列表中更短的 host-suffix 覆盖的 host-suffix。
+
+    同列表、同类型，模拟器下的去向不变；host 等其他类型优先级不同，保留不动。
+    """
+    suffixes = {r.value for r in rules if r.type == "host-suffix"}
+
+    def covered(value: str) -> bool:
+        labels = value.split(".")
+        return any(".".join(labels[i:]) in suffixes for i in range(1, len(labels)))
+
+    kept = [r for r in rules if r.type != "host-suffix" or not covered(r.value)]
+    return kept, len(rules) - len(kept)
+
+
 def _check_drop(previous: Mapping[str, int] | None, report: BuildReport) -> None:
     if previous is None:
         report.warnings.append("no previous china.list; upstream drop check skipped")
@@ -206,6 +224,10 @@ def build(
     for bundle in load_bundles(bundles_dir):
         report.errors += validate_bundle(bundle)
         merged, header = _merge(bundle, upstream, report)
+        rules, dropped = drop_covered(merged.rules)
+        if dropped:
+            merged = dataclasses.replace(merged, rules=tuple(rules))
+            report.redundant[merged.name] = dropped
         bundles.append(merged)
         headers[merged.name] = header
     _check_drop(previous, report)

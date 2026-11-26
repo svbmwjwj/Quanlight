@@ -155,3 +155,21 @@ def test_build_replaces_its_own_previous_output(tmp_path):
     (args["out_dir"] / "stale.list").write_text("old")
     assert build(**args).errors == []
     assert not (args["out_dir"] / "stale.list").exists()
+
+
+def test_drop_covered_keeps_routing():
+    from quanlight.build import drop_covered
+
+    rules = [hs("qq.com"), hs("a.qq.com"), hs("b.a.qq.com"), Rule("host", "c.qq.com", "x"), hs("qq.com.cn"), hs("cn")]
+    kept, dropped = drop_covered(rules)
+    assert [(r.type, r.value) for r in kept] == [("host-suffix", "qq.com"), ("host", "c.qq.com"), ("host-suffix", "cn")]
+    assert dropped == 3
+
+
+def test_build_reports_dropped_suffixes(tmp_path):
+    args = setup(tmp_path, dnsmasq=("taobao.com", "www.taobao.com", "qq.com"))
+    report = build(**args)
+    assert report.errors == []
+    assert report.redundant == {"china": 1}
+    assert "www.taobao.com" not in (args["out_dir"] / "china.list").read_text()
+    assert "dropped 1 host-suffix" in report.to_markdown()

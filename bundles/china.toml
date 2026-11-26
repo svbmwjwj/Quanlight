@@ -14,3 +14,473 @@ kind = "china-operator-ip"
 
 # 上游未收录、经人工核实的直连条目写成 [[rule]]（source = "manual"、"observed" 或 "official:<网址>"）。
 # 从上游剔除的条目写成 [[exclude]]；反向检查命中但确认应直连的条目写成 [[keep]]，都须写 reason。
+
+# 首次构建反向检查命中的处理（2026-11-26，按本人决定）。
+
+[[exclude]]
+value = "top"
+reason = "generic TLD listed for its Chinese registry; most .top sites are overseas, mainland ones fall back to China IP"
+
+[[exclude]]
+value = "wang"
+reason = "generic TLD listed for its Chinese registry; hits are overseas brand registrations"
+
+[[exclude]]
+value = "moomoo.com"
+reason = "moomoo serves overseas users only"
+
+[[exclude]]
+value = "moomooequity.com"
+reason = "moomoo serves overseas users only"
+
+[[exclude]]
+value = "moomootrustee.com"
+reason = "moomoo serves overseas users only"
+
+[[exclude]]
+value = "tik-tokapi.com"
+reason = "TikTok is not available in mainland China"
+
+[[exclude]]
+value = "tiktokrow-cdn.com"
+reason = "TikTok is not available in mainland China"
+
+[[exclude]]
+value = "likeevideo.ru"
+reason = "Likee serves overseas users only"
+
+[[exclude]]
+value = "likee.video"
+reason = "Likee serves overseas users only"
+
+[[exclude]]
+value = "like.video"
+reason = "Likee serves overseas users only"
+
+[[exclude]]
+value = "joox.com"
+reason = "JOOX serves overseas markets only"
+
+[[exclude]]
+value = "webnovel.com"
+reason = "WebNovel is the overseas edition of Qidian"
+
+[[exclude]]
+value = "inshotapp.com"
+reason = "InShot serves overseas users only"
+
+[[exclude]]
+value = "kimi.ai"
+reason = "overseas edition of Kimi; mainland users use kimi.com and moonshot.cn"
+
+[[exclude]]
+value = "moonshot.ai"
+reason = "overseas edition of Kimi; mainland users use kimi.com and moonshot.cn"
+
+[[exclude]]
+value = "minimax.io"
+reason = "overseas edition of MiniMax; mainland users use minimaxi.com"
+
+[[exclude]]
+value = "lovart.ai"
+reason = "Lovart serves overseas users only"
+
+[[exclude]]
+value = "qoder.com"
+reason = "Qoder serves overseas users; mainland edition is separate"
+
+[[exclude]]
+value = "genshinimpact.com"
+reason = "HoYoverse overseas game servers and accounts"
+
+[[exclude]]
+value = "honkaiimpact3.com"
+reason = "HoYoverse overseas game servers and accounts"
+
+[[exclude]]
+value = "honkaistarrail.com"
+reason = "HoYoverse overseas game servers and accounts"
+
+[[exclude]]
+value = "hoyo.link"
+reason = "HoYoverse overseas game servers and accounts"
+
+[[exclude]]
+value = "hoyoverse.com"
+reason = "HoYoverse overseas game servers and accounts"
+
+[[exclude]]
+value = "zenlesszonezero.com"
+reason = "HoYoverse overseas game servers and accounts"
+
+[[exclude]]
+value = "nikke-de.com"
+reason = "NIKKE overseas game servers"
+
+[[exclude]]
+value = "nikke-en.com"
+reason = "NIKKE overseas game servers"
+
+[[exclude]]
+value = "nikke-fr.com"
+reason = "NIKKE overseas game servers"
+
+[[exclude]]
+value = "nikke-jp.com"
+reason = "NIKKE overseas game servers"
+
+[[exclude]]
+value = "nikke-kr.com"
+reason = "NIKKE overseas game servers"
+
+[[exclude]]
+value = "nikke-sea.com"
+reason = "NIKKE overseas game servers"
+
+[[exclude]]
+value = "yostar.net"
+reason = "Yostar overseas game publishing"
+
+[[exclude]]
+value = "pokemon-unitepgame.com"
+reason = "Pokemon UNITE overseas servers; mainland edition uses Tencent domains"
+
+[[exclude]]
+value = "qtlglb.com"
+reason = "hits are Steam edge nodes outside mainland China"
+
+[[exclude]]
+value = "okaapps.com"
+reason = "overseas apps; only zh.okaapps.com is mainland per v2fly"
+
+[[exclude]]
+value = "sci-hub.ee"
+reason = "Sci-Hub mirror, blocked in mainland China"
+
+[[exclude]]
+value = "binancezh.kim"
+reason = "Binance mirror, blocked in mainland China"
+
+[[exclude]]
+value = "binancezh.link"
+reason = "Binance mirror, blocked in mainland China"
+
+[[exclude]]
+value = "mypikpak.com"
+reason = "PikPak serves overseas users and is blocked in mainland China"
+
+[[exclude]]
+value = "mypikpak.net"
+reason = "PikPak serves overseas users and is blocked in mainland China"
+
+[[exclude]]
+value = "pikpak.me"
+reason = "PikPak serves overseas users and is blocked in mainland China"
+
+[[exclude]]
+value = "pikpakdrive.com"
+reason = "PikPak serves overseas users and is blocked in mainland China"
+
+[[exclude]]
+value = "cnpmjs.org"
+reason = "retired npm mirror hosted overseas"
+
+[[exclude]]
+value = "cnbetacdn.com"
+reason = "listed as overseas by v2fly"
+
+[[exclude]]
+value = "maa.plus"
+reason = "MAA project sites hosted overseas"
+
+[[exclude]]
+value = "prts.plus"
+reason = "MAA project sites hosted overseas"
+
+[[exclude]]
+value = "n0vadesktop.com"
+reason = "HoYoverse N0vaDesktop overseas edition"
+
+[[exclude]]
+value = "91cy.app"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "99thz.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "aa77kk.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "age.tv"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "agedm.app"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "agefans.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "asmr.gay"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "avstar4.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "cxacg.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "eilieili.cc"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "fi11.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "footseen.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "hshsxkj.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "huati.cc"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "igkbroker.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "jhxl.org"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "mangafuna.xyz"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "omobi.cc"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "picacgp.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "sifangclub.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "tantaly.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "thzu.cc"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "xn--2vxsp6vi4j.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "xn--sgt856gbjl.cc"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[exclude]]
+value = "yantaqu.com"
+reason = "anime, piracy or adult site hosted overseas"
+
+[[keep]]
+value = "cn"
+reason = "mainland country-code TLD; overseas companies' .cn sites are reachable directly"
+
+[[keep]]
+value = "xn--fiqs8s"
+reason = "mainland country-code TLD; overseas companies' .cn sites are reachable directly"
+
+[[keep]]
+value = "xn--55qx5d"
+reason = "CNNIC-run Chinese-language TLD used mostly by mainland sites"
+
+[[keep]]
+value = "xn--io0a7i"
+reason = "CNNIC-run Chinese-language TLD used mostly by mainland sites"
+
+[[keep]]
+value = "aliyuncs.com"
+reason = "Alibaba Cloud services used by mainland apps"
+
+[[keep]]
+value = "alicloud.com"
+reason = "Alibaba Cloud services used by mainland apps"
+
+[[keep]]
+value = "alibabacloud.com"
+reason = "Alibaba Cloud international site, reachable from mainland and shares mainland infrastructure"
+
+[[keep]]
+value = "ctyun.online"
+reason = "China Telecom cloud"
+
+[[keep]]
+value = "quantil.com"
+reason = "ChinaNetCenter (Wangsu) CDN"
+
+[[keep]]
+value = "miniso.com"
+reason = "MINISO, mainland retailer"
+
+[[keep]]
+value = "futu5.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futuau.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futuesop.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futufin.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futuhn.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futuniuniu.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futunn.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "futustatic.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "fututrade.com"
+reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "itiger.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "itigergrowth.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "itigergrowtha.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "itigerup.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "laohu8.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "tigerbbs.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "xiaohu8.com"
+reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "longbridgeapp.com"
+reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "longbridgehk.com"
+reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "lbctrl.com"
+reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "lbkrs.com"
+reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "wbrks.com"
+reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+
+[[keep]]
+value = "hp-ww.com"
+reason = "HP sites reachable from mainland China"
+
+[[keep]]
+value = "hp.com"
+reason = "HP sites reachable from mainland China"
+
+[[keep]]
+value = "hpconnected.com"
+reason = "HP sites reachable from mainland China"
+
+[[keep]]
+value = "hpstore-china.com"
+reason = "HP sites reachable from mainland China"
+
+[[keep]]
+value = "microsoftuwp.com"
+reason = "Microsoft service reachable from mainland China"
+
+[[keep]]
+value = "galaxyappstore.com"
+reason = "Samsung Galaxy Store, available in mainland China"
+
+[[keep]]
+value = "calgoncarbon-china.com"
+reason = "Calgon Carbon China site"
+
+[[keep]]
+value = "acs.org"
+reason = "American Chemical Society publications, reachable from mainland universities"
+
+[[keep]]
+value = "ccb.com"
+reason = "China Construction Bank; hit is its overseas branch site ru.ccb.com"
+
+[[keep]]
+value = "hsbc.com.cn"
+reason = "HSBC China; v2fly lists it in both geolocation-cn and geolocation-!cn"
+
+[[keep]]
+value = "hsbcqh.com.cn"
+reason = "HSBC China; v2fly lists it in both geolocation-cn and geolocation-!cn"
+
+[[keep]]
+value = "hsbcinsurance.com.cn"
+reason = "HSBC China; v2fly lists it in both geolocation-cn and geolocation-!cn"
+
+[[keep]]
+value = "cdn20.com"
+reason = "ChinaNetCenter (Wangsu) CDN with mainland name servers; licdn.cn.cdn20.com no longer resolves"
+
+[[keep]]
+value = "kuke.com"
+reason = "Kuke Music, Beijing; Alibaba DNS and an Alibaba Cloud Beijing address"
+
+[[keep]]
+value = "nike.host"
+reason = "registered in Beijing, parked on Alibaba Cloud; not Nike"
