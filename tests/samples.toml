@@ -111,3 +111,39 @@ expect = "google"
 [[sample]]
 host = "fonts.googleapis.com"
 expect = "direct"
+
+[[sample]]
+host = "rainbow.me"
+expect = "rainbow"
+
+[[sample]]
+host = "phantom.app"
+expect = "phantom"
+
+[[sample]]
+host = "www.kraken.com"
+expect = "kraken"
+
+[[sample]]
+host = "app.uniswap.org"
+expect = "uniswap"
+
+[[sample]]
+host = "etherscan.io"
+expect = "etherscan"
+
+[[sample]]
+host = "app.hyperliquid.xyz"
+expect = "hyperliquid"
+
+[[sample]]
+host = "abc.arweave.net"
+expect = "arweave"
+
+[[sample]]
+host = "ipfs.io"
+expect = "ipfs"
+
+[[sample]]
+host = "www.binance.com"
+expect = "direct"

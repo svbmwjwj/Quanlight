@@ -1,0 +1,9 @@
+name = "phantom"
+description = "Phantom wallet"
+order = 31
+
+[[rule]]
+type = "host-suffix"
+value = "phantom.app"
+role = "core"
+source = "legacy:ios"

@@ -1,0 +1,9 @@
+name = "arweave"
+description = "Arweave gateway; content is served from subdomains"
+order = 36
+
+[[rule]]
+type = "host-suffix"
+value = "arweave.net"
+role = "core"
+source = "legacy:ios"

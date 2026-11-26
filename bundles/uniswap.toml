@@ -1,0 +1,9 @@
+name = "uniswap"
+description = "Uniswap"
+order = 33
+
+[[rule]]
+type = "host-suffix"
+value = "uniswap.org"
+role = "core"
+source = "legacy:ios"
