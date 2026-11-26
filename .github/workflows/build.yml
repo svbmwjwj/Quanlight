@@ -28,7 +28,7 @@ jobs:
       - name: Build and check lists
         run: uv run quanlight build --out dist --owner "${{ github.repository_owner }}" --repo quanlight
       - name: Probe lists
-        run: uv run quanlight probe --out dist/probe --base-url "$BASE_URL"
+        run: uv run quanlight probe --out dist/probe --base-url "https://ghfast.top/$BASE_URL"
       - name: Publish to release branch
         run: |
           set -euo pipefail
