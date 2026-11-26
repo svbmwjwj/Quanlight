@@ -14,11 +14,11 @@ iOS 与 macOS 都用代理托底：只为中国大陆常用的地址写直连规
 规则库的目标：
 
 - 准确：国内应用不误走代理；被封锁的境外服务不被直连规则吞掉（Claude）。
-- 完整：国内常用服务的域名与网段尽量覆盖，漏掉的由大陆 IP 回退兜底（用户，D-028）。
+- 够用：覆盖本人常用的国内应用与场景，其余国内流量由大陆 IP 回退兜底（用户，D-029）。
 - 可控：规则、例外与取舍都写成仓库里可审阅的文件，每条注明来源与理由。
 - 可验证：每次构建自动检查反向误伤与回归，异常时不发布。
 
-取舍只看规则是否科学、完善，不以规则条数或设备内存占用为约束（用户，D-003）；宽口径下的内存表现须在真机上验证（D-028）。
+取舍只看规则是否科学、完善，不以规则条数或设备内存占用为约束（用户，D-003）。
 
 ## 阶段
 
@@ -87,18 +87,20 @@ quanlight/
 每个清单输出一个列表（Claude）：
 
 - `apns.toml`：手写的 `[[rule]]`，见“APNs 包”。
-- `china.toml`：以 `[[upstream]]` 声明三个直连数据源（D-028），另可手写补充与排除。
+- `china.toml`：以 `[[upstream]]` 声明直连数据源（D-029），另可手写补充与排除。
 
 ```toml
 name = "china"
 description = "Mainland China domains and IP ranges"
 order = 20                  # 订阅顺序，数字小的在前
 
-[[upstream]]
-kind = "dnsmasq-china-list"
+[[upstream]]                # 每个常用应用一个 v2fly 文件
+kind = "v2fly"
+file = "tencent"
+apps = "WeChat, QQ"
 
 [[upstream]]
-kind = "v2fly-geolocation-cn"
+kind = "dnsmasq-apple-china"
 
 [[upstream]]
 kind = "china-operator-ip"
@@ -123,17 +125,31 @@ reason = "..."
 - `[[rule]]`：`type`、`value`、`source` 必填；`source` 取值有 `official:<网址>`、`observed`、`manual`；`manual` 与 `observed` 须写 `reason`。
 - `[[exclude]]`：按值精确剔除上游条目，须写 `reason`。
 - `[[keep]]`：反向检查的豁免，须写 `reason`。
+- `[[upstream]]`：`kind = "v2fly"` 时 `file` 与 `apps` 必填，`apps` 写这个文件服务于哪些常用应用。
 - 包级 `order` 决定订阅顺序。
 
 ## 直连数据
 
-直连数据每次构建从上游同步，不冻结进清单（Claude）：数据量大且日常变动，冻结只会让清单变成上游的副本。上游变化经 Actions 摘要呈现，发布前由人审阅（D-020）。
+直连数据每次构建从上游同步，不冻结进清单（Claude）。上游变化经 Actions 摘要呈现，发布前由人审阅（D-020）；只用到几个公司文件，每次差异通常只有几行。
 
-数据源与导入方式（用户：宽口径，D-028；导入细节 Claude）：
+数据源按本人常用场景选取（用户：应用名单，D-029；文件对应 Claude）：
 
-- dnsmasq-china-list：只取 `accelerated-domains.china.conf`，每行 `server=/<域名>/<DNS>` 生成 `host-suffix, <域名>`。`apple.china.conf` 与 `google.china.conf` 是否采用待定。
-- v2fly `geolocation-cn`：按下表映射；与 dnsmasq-china-list 重复的条目去重。
-- gaoyifan/china-operator-ip：`china.txt`、`china6.txt` 生成 `ip-cidr` 与 `ip6-cidr`（D-006）。
+| 常用应用 | 数据源 |
+|---|---|
+| 微信、QQ | v2fly `tencent` |
+| 小红书 | v2fly `xiaohongshu` |
+| 支付宝、淘宝 | v2fly `alibaba` |
+| 云闪付 | v2fly `unionpay` |
+| 中国银行、招商银行 | v2fly `boc`、`cmb` |
+| 京东、美团、抖音、滴滴 | v2fly `jd`、`meituan`、`douyin`、`didi` |
+| 12306 与其他 .cn 站点 | 手写 `host-suffix, cn` |
+| iCloud 中国区、App Store | dnsmasq-china-list `apple.china.conf` |
+| 其余国内流量 | gaoyifan/china-operator-ip 大陆网段（D-006） |
+
+- v2fly 文件按下表映射；多个文件重复的条目去重（Claude）。
+- `apple.china.conf` 每行 `server=/<域名>/<DNS>` 生成 `host-suffix, <域名>`（Claude）。
+- 大陆网段：`china.txt`、`china6.txt` 生成 `ip-cidr` 与 `ip6-cidr`（D-006）。
+- 新增常用应用时，在 `china.toml` 加一个 `[[upstream]]`，并在样本里补一条（Claude）。
 
 v2fly 条目的导入映射（Claude）：
 
@@ -184,7 +200,7 @@ final, <代理策略>
    - 域名覆盖的判定：`host` 为完全相等；`host-suffix` 为相等或以 `.<值>` 结尾；`host-wildcard` 按通配符匹配。
    - IP 覆盖的判定：大陆网段与境外网段有任何重叠。
    - 命中的条目须在 `china.toml` 中用 `[[exclude]]` 剔除或用 `[[keep]]` 豁免，否则失败。首次构建的命中数量未知（待调研）。
-5. 样本测试：`tests/samples.toml` 逐条写明主机或 IP 及期望去向，按同一模拟器判定（Claude）。样本包括淘宝、微信、支付宝、B 站应直连，Google、Telegram、Claude、X 应落到 `final`，`courier.push.apple.com` 应命中 APNs。
+5. 样本测试：`tests/samples.toml` 逐条写明主机或 IP 及期望去向，按同一模拟器判定（Claude）。样本包括每个常用应用至少一条主机应直连（含 iCloud 中国区与 App Store），Google、Telegram、Claude、X 应落到 `final`，`courier.push.apple.com` 应命中 APNs。
 6. 生成：三列格式；文件头注释写数据来源与上游版本，不写生成时间，内容无变化时不产生新提交（Claude）。
 7. 发布：全部检查通过后，用 `GITHUB_TOKEN`（`contents: write`）推送到 `release` 分支，并刷新 jsDelivr 缓存（Claude）。
 
@@ -210,7 +226,6 @@ final, <代理策略>
 
 发布前在 iOS 上验证（Claude）：
 
-- 内存：导入宽口径列表后正常使用一两天，观察 Quantumult X 隧道是否被系统重启（D-028）。
 - 国内应用：在请求记录中查找命中 `final` 的国内域名，重点看微信、支付宝、银行、运营商一键登录与 12306；漏掉的补进 `china.toml` 的 `[[rule]]`，`source = "observed"`。
 - 推送：确认 Telegram 通知可达，且推送连接命中 APNs 包。
 
@@ -226,7 +241,7 @@ final, <代理策略>
   - 检测：`build.yml` 在每天北京时间 02:00 与推送 `main` 时运行测试、构建与检查，并在 Actions 摘要中列出产物相对 `release` 分支的变化，不发布；此时令牌只有读权限（Claude）。
   - 发布：在 Actions 页面对 `main` 手动运行 `build` 并勾选 `publish`，检查通过后由单独的任务强制推送 `release` 并刷新 jsDelivr；读取 `release` 失败时不推送（Claude）。
   - 自动更新：省略 `update-interval` 时，Quantumult X 对所有远程资源每 86400 秒自动同步一次，负数才关闭自动同步[^2]；因此模板、本人配置与发布说明片段的 `[filter_remote]` 都写 `update-interval=-1`，`[server_remote]`、`[rewrite_remote]` 不变（用户，D-023）。
-- 许可证：构建代码与产物均为 MIT；NOTICE 列出 dnsmasq-china-list、v2fly（MIT，保留其版权声明）与 gaoyifan/china-operator-ip 等来源（Claude，D-013；dnsmasq-china-list 的许可待调研）。
+- 许可证：构建代码与产物均为 MIT；NOTICE 列出 dnsmasq-china-list、v2fly（MIT，保留其版权声明）与 gaoyifan/china-operator-ip 等来源（Claude，D-013）。
 
 ## macOS
 
@@ -235,15 +250,12 @@ macOS 订阅同一组列表，只在配置模板上与 iOS 不同，第 3 阶段
 ## 待定事项
 
 - [x] 仓库名：`quanlight`（D-001）。
-- [x] iOS 内存：不作为约束（D-003）；宽口径下须真机验证（D-028）。
+- [x] iOS 内存：不作为约束（D-003）。
 - [x] 大陆 IP 数据源：gaoyifan/china-operator-ip（D-006）。
 - [x] iOS 产物的许可证：MIT（D-013）。
 - [x] Quantumult X 的匹配语义：本地先于远程、`host` 先于 `host-suffix`、同类型按顺序、通配符不匹配裸域名、主机规则不匹配 CNAME 目标（D-019）。
-- [x] 两类设备都用代理托底（D-026）；境外服务包只留 APNs（D-027）；直连数据取宽口径（D-028）。
-- [ ] 是否采用 dnsmasq-china-list 的 `apple.china.conf` 与 `google.china.conf`（待定）。
-- [ ] 宽口径列表在 iOS 上的内存表现（待调研）。
+- [x] 两类设备都用代理托底（D-026）；境外服务包只留 APNs（D-027）；直连数据按常用场景整理（D-029）。
 - [ ] 反向检查首次命中的数量与处理方式（待调研）。
-- [ ] dnsmasq-china-list 的许可证（待调研）。
 - [ ] APNs 实际使用的 IP 网段，以及推送是否以纯 IP 连接（待调研）。
 - [ ] “分流匹配优化”开关的影响，以及 `host-suffix`、`host-wildcard`、`host-keyword` 之间的优先级（待调研）。
 - [ ] jsDelivr 与 GitHub 地址在大陆直连的可用性（待调研）。

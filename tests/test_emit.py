@@ -9,7 +9,7 @@ def r(type_, value):
 
 
 RULES = [r("ip-cidr", "1.0.1.0/24"), r("host-suffix", "qq.com"), r("host", "a.qq.com"), r("host", "a.qq.com")]
-HEADER = ["# upstream dnsmasq-china-list: abc (entries: 2)"]
+HEADER = ["# upstream dnsmasq-apple-china: abc (entries: 2)"]
 
 
 def test_render_list_deterministic():

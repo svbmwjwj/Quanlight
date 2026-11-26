@@ -69,7 +69,7 @@ def expand(data_dir: Path, name: str, exclude: Iterable[str] = ()) -> list[Entry
     return walk(name, ())
 
 
-# geolocation-cn 的导入映射（设计文档“直连数据”）：
+# v2fly 公司文件的导入映射（设计文档“直连数据”）：
 # 无前缀或 domain: -> host-suffix，full: -> host；@!cn、@ads 与 keyword: 不导入，regexp: 计数丢弃。
 def import_direct(entries: Iterable[Entry], source: str) -> ImportResult:
     result = ImportResult()

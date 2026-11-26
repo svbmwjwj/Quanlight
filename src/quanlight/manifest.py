@@ -5,7 +5,7 @@ import re
 import tomllib
 from pathlib import Path
 
-from .model import HOST_TYPES, RULE_TYPES, Bundle, Note, Rule, normalize_host
+from .model import HOST_TYPES, RULE_TYPES, Bundle, Note, Rule, UpstreamSpec, normalize_host
 from .sources import UPSTREAM_KINDS
 
 _HOST_RE = re.compile(r"^[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?(\.[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?)*$")
@@ -19,6 +19,7 @@ _MANUAL_SOURCES = ("observed", "manual")
 _BUNDLE_KEYS = {"name", "description", "order", "rule", "upstream", "exclude", "keep"}
 _RULE_KEYS = {"type", "value", "source", "reason"}
 _NOTE_KEYS = {"value", "reason"}
+_UPSTREAM_KEYS = {"kind", "file", "apps"}
 
 
 class ManifestError(Exception):
@@ -51,6 +52,11 @@ def _note_from_table(table: dict, where: str) -> Note:
     return Note(value=normalize_host(table.get("value", "")), reason=table.get("reason", ""))
 
 
+def _upstream_from_table(table: dict, where: str) -> UpstreamSpec:
+    _check_keys(table, _UPSTREAM_KEYS, where)
+    return UpstreamSpec(kind=table.get("kind", ""), file=table.get("file"), apps=table.get("apps"))
+
+
 def load_bundle(path: Path) -> Bundle:
     with path.open("rb") as fh:
         data = tomllib.load(fh)
@@ -60,7 +66,7 @@ def load_bundle(path: Path) -> Bundle:
         description=data["description"],
         order=data["order"],
         rules=tuple(_rule_from_table(t, f"{path.name} [[rule]]") for t in data.get("rule", ())),
-        upstream=tuple(t["kind"] for t in data.get("upstream", ())),
+        upstream=tuple(_upstream_from_table(t, f"{path.name} [[upstream]]") for t in data.get("upstream", ())),
         exclude=tuple(_note_from_table(t, f"{path.name} [[exclude]]") for t in data.get("exclude", ())),
         keep=tuple(_note_from_table(t, f"{path.name} [[keep]]") for t in data.get("keep", ())),
     )
@@ -104,9 +110,16 @@ def validate_bundle(bundle: Bundle) -> list[str]:
     errors: list[str] = []
     if not _NAME_RE.match(bundle.name) or bundle.name in RESERVED_NAMES:
         errors.append(f"{bundle.name!r}: bundle name must be kebab-case and not one of {sorted(RESERVED_NAMES)}")
-    for kind in bundle.upstream:
-        if kind not in UPSTREAM_KINDS:
-            errors.append(f"{bundle.name}: unknown upstream kind {kind!r}")
+    keys = [spec.key for spec in bundle.upstream]
+    for key in sorted({k for k in keys if keys.count(k) > 1}):
+        errors.append(f"{bundle.name}: duplicate upstream {key}")
+    for spec in bundle.upstream:
+        if spec.kind not in UPSTREAM_KINDS:
+            errors.append(f"{bundle.name}: unknown upstream kind {spec.kind!r}")
+        elif spec.kind == "v2fly" and not (spec.file and spec.apps):
+            errors.append(f"{bundle.name}: v2fly upstream needs file and apps")
+        elif spec.kind != "v2fly" and spec.file is not None:
+            errors.append(f"{bundle.name}: {spec.kind} upstream takes no file")
     for rule in bundle.rules:
         where = f"{bundle.name}: {rule.type}, {rule.value}"
         if rule.type not in RULE_TYPES:

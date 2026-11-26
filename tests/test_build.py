@@ -7,7 +7,8 @@ from quanlight.model import Rule
 APNS = 'name = "apns"\ndescription = "d"\norder = 10\n[[rule]]\ntype = "host-suffix"\nvalue = "push.apple.com"\nsource = "manual"\nreason = "r"\n'
 CHINA = (
     'name = "china"\ndescription = "d"\norder = 20\n'
-    '[[upstream]]\nkind = "dnsmasq-china-list"\n[[upstream]]\nkind = "china-operator-ip"\n'
+    '[[upstream]]\nkind = "v2fly"\nfile = "svc"\napps = "Svc"\n'
+    '[[upstream]]\nkind = "dnsmasq-apple-china"\n[[upstream]]\nkind = "china-operator-ip"\n'
 )
 SAMPLES = (
     '[[sample]]\nhost = "courier.push.apple.com"\nexpect = "apns"\n'
@@ -18,7 +19,7 @@ SAMPLES = (
 )
 
 
-def hs(value, source="dnsmasq-china-list"):
+def hs(value, source="dnsmasq-apple-china"):
     return Rule("host-suffix", value, source)
 
 
@@ -30,7 +31,8 @@ def setup(tmp_path: Path, china_extra: str = "", dnsmasq=("taobao.com", "qq.com"
     samples_path = tmp_path / "samples.toml"
     samples_path.write_text(samples)
     upstream = {
-        "dnsmasq-china-list": Upstream("dnsmasq-china-list", "abc", [hs(d) for d in dnsmasq]),
+        "v2fly:svc": Upstream("v2fly:svc", "v2", [Rule("host", "api.svc.cn", "v2fly:svc"), hs("tmall.com", "v2fly:svc")]),
+        "dnsmasq-apple-china": Upstream("dnsmasq-apple-china", "abc", [hs(d) for d in dnsmasq]),
         "china-operator-ip": Upstream(
             "china-operator-ip",
             "def",
@@ -48,7 +50,7 @@ def setup(tmp_path: Path, china_extra: str = "", dnsmasq=("taobao.com", "qq.com"
         upstream=upstream,
         check=check,
         samples=samples_path,
-        previous={"dnsmasq-china-list": 3, "china-operator-ip": 2},
+        previous={"dnsmasq-apple-china": 3, "china-operator-ip": 2},
         owner="owner",
         repo="quanlight",
         static_files=(),
@@ -63,13 +65,15 @@ def test_build_writes_lists(tmp_path):
     china = (out / "china.list").read_text()
     assert "host-suffix, taobao.com, china" in china
     assert "ip6-cidr, 2400::/12, china" in china
-    assert "# upstream dnsmasq-china-list: abc (entries: 2)" in china
+    assert "# upstream dnsmasq-apple-china: abc (entries: 2)" in china
     assert "host-suffix, push.apple.com, apns" in (out / "apns.list").read_text()
     readme = (out / "README.md").read_text()
     assert "https://raw.githubusercontent.com/owner/quanlight/release/china.list" in readme
-    assert report.counts == {"apns": 1, "china": 4}
+    assert report.counts == {"apns": 1, "china": 6}
+    assert "# upstream v2fly:svc: v2 (entries: 2)" in china
+    assert report.sources["v2fly:svc"].added == 2
     assert report.sizes["china"] == (out / "china.list").stat().st_size
-    assert read_previous_counts(out / "china.list") == {"dnsmasq-china-list": 2, "china-operator-ip": 2}
+    assert read_previous_counts(out / "china.list") == {"v2fly:svc": 2, "dnsmasq-apple-china": 2, "china-operator-ip": 2}
 
 
 def test_reverse_hit_fails_without_writing(tmp_path):
@@ -86,7 +90,7 @@ def test_exclude_and_keep_clear_hits(tmp_path):
     report = build(**excluded)
     assert report.errors == []
     assert "google.com" not in (excluded["out_dir"] / "china.list").read_text()
-    assert report.sources["dnsmasq-china-list"].added == 1
+    assert report.sources["dnsmasq-apple-china"].added == 1
     kept = setup(tmp_path / "b", '[[keep]]\nvalue = "t.me"\nreason = "checked"\n', ("taobao.com", "t.me"))
     report = build(**kept)
     assert report.errors == []
@@ -123,7 +127,7 @@ def test_samples_mismatch_fails(tmp_path):
 
 def test_upstream_drop_fails_and_missing_previous_warns(tmp_path):
     args = setup(tmp_path / "a")
-    args["previous"] = {"dnsmasq-china-list": 5}
+    args["previous"] = {"dnsmasq-apple-china": 5}
     assert any("down from 5" in e for e in build(**args).errors)
     args = setup(tmp_path / "b")
     args["previous"] = None

@@ -13,9 +13,12 @@ routed directly before anything is published.
 - `apns.list`: Apple Push Notification service. Subscribe it first and force
   it through the proxy; push notifications for apps such as Telegram fail
   when it connects directly.
-- `china.list`: mainland China domains and networks, forced to `direct`.
-  Built from dnsmasq-china-list (`accelerated-domains.china.conf`), v2fly
-  `geolocation-cn` and gaoyifan/china-operator-ip.
+- `china.list`: domains of everyday mainland apps plus mainland networks,
+  forced to `direct`. Built from the v2fly company files listed in
+  `bundles/china.toml` (Tencent, Alibaba, JD, Meituan and others),
+  dnsmasq-china-list `apple.china.conf` for iCloud China and the App Store,
+  a `host-suffix, cn` rule, and gaoyifan/china-operator-ip. Other mainland
+  traffic is caught by the mainland network ranges after DNS resolution.
 
 iOS and macOS subscribe to the same lists.
 
@@ -83,6 +86,9 @@ a data source shrinks by more than half.
 
 Edit `bundles/china.toml`:
 
+- `[[upstream]]`: to cover another everyday app, add `kind = "v2fly"` with
+  the v2fly `file` and the `apps` it serves, and add a sample to
+  `tests/samples.toml`.
 - `[[rule]]`: a direct entry the datasets miss, with `type`, `value`,
   `source` (`official:<url>`, `observed` or `manual`) and a `reason`.
 - `[[exclude]]`: drop every upstream entry with this value, with a `reason`.

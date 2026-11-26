@@ -31,7 +31,7 @@ _UPSTREAM_HEADER_RE = re.compile(r"^# upstream (\S+): \S+ \(entries: (\d+)\)$")
 class Upstream:
     """一个直连数据源同步并解析后的结果。"""
 
-    kind: str
+    kind: str  # UpstreamSpec.key
     version: str
     rules: list[Rule]
     skipped: dict[str, list[str]] = field(default_factory=dict)  # 原因 -> 未导入的条目
@@ -120,7 +120,8 @@ def _merge(bundle: Bundle, upstream: Mapping[str, Upstream], report: BuildReport
     rules = list(bundle.rules)
     seen = {(r.type, r.value) for r in rules}
     header: list[str] = []
-    for kind in bundle.upstream:
+    for spec in bundle.upstream:
+        kind = spec.key
         if kind not in upstream:
             report.errors.append(f"{bundle.name}: no upstream data for {kind}")
             continue

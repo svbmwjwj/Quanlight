@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from quanlight.manifest import ManifestError, check_bundle_files, load_bundle, validate_bundle
-from quanlight.model import Bundle, Note, Rule
+from quanlight.model import Bundle, Note, Rule, UpstreamSpec
 
 HEAD = 'name = "svc"\ndescription = "d"\norder = 1\n'
 
@@ -25,14 +25,16 @@ def rule(type_: str, value: str, source: str = "manual", reason: str | None = "r
 def test_load_full_manifest(tmp_path):
     path = write(
         tmp_path,
-        HEAD + '[[upstream]]\nkind = "dnsmasq-china-list"\n'
+        HEAD + '[[upstream]]\nkind = "v2fly"\nfile = "tencent"\napps = "WeChat, QQ"\n'
+        '[[upstream]]\nkind = "dnsmasq-apple-china"\n'
         '[[rule]]\ntype = "host-suffix"\nvalue = "Example.CN."\nsource = "manual"\nreason = "r"\n'
         '[[exclude]]\nvalue = "Blocked.com"\nreason = "overseas"\n'
         '[[keep]]\nvalue = "1.0.1.0/24"\nreason = "mainland"\n',
     )
     bundle = load_bundle(path)
     assert bundle.rules == (Rule("host-suffix", "example.cn", "manual", "r"),)
-    assert bundle.upstream == ("dnsmasq-china-list",)
+    assert bundle.upstream == (UpstreamSpec("v2fly", "tencent", "WeChat, QQ"), UpstreamSpec("dnsmasq-apple-china"))
+    assert [u.key for u in bundle.upstream] == ["v2fly:tencent", "dnsmasq-apple-china"]
     assert bundle.exclude == (Note("blocked.com", "overseas"),)
     assert bundle.keep == (Note("1.0.1.0/24", "mainland"),)
     assert validate_bundle(bundle) == []
@@ -54,7 +56,17 @@ def test_load_rejects_retired_keys(tmp_path, body):
 
 def test_validate_rejects_unknown_type_and_upstream():
     assert any("ip-asn" in e for e in validate_bundle(bundle_with(rule("ip-asn", "13335"))))
-    assert any("nope" in e for e in validate_bundle(bundle_with(upstream=("nope",))))
+    assert any("nope" in e for e in validate_bundle(bundle_with(upstream=(UpstreamSpec("nope"),))))
+
+
+def test_validate_upstream_fields():
+    def errs(*specs):
+        return validate_bundle(bundle_with(upstream=specs))
+
+    assert any("file and apps" in e for e in errs(UpstreamSpec("v2fly", "tencent")))
+    assert any("takes no file" in e for e in errs(UpstreamSpec("china-operator-ip", "x")))
+    assert any("duplicate" in e for e in errs(UpstreamSpec("v2fly", "jd", "JD"), UpstreamSpec("v2fly", "jd", "JD")))
+    assert errs(UpstreamSpec("v2fly", "jd", "JD"), UpstreamSpec("china-operator-ip")) == []
 
 
 def test_validate_reason_rules():

@@ -15,10 +15,10 @@ V2FLY_REPO = {
     "branch": "master",
     "url": "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
 }
-DNSMASQ_REPO = {
+DNSMASQ_APPLE_REPO = {
     "repo": "felixonmars/dnsmasq-china-list",
     "branch": "master",
-    "url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf",
+    "url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf",
 }
 CHINA_IP_REPO = {
     "repo": "gaoyifan/china-operator-ip",
@@ -27,8 +27,8 @@ CHINA_IP_REPO = {
     "v6": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
 }
 
-# 清单中 [[upstream]] 可用的 kind（D-028）。
-UPSTREAM_KINDS = ("dnsmasq-china-list", "v2fly-geolocation-cn", "china-operator-ip")
+# 清单中 [[upstream]] 可用的 kind（D-029）。
+UPSTREAM_KINDS = ("v2fly", "dnsmasq-apple-china", "china-operator-ip")
 
 # 反向检查用的 GitHub meta 键：客户端会直接访问的网段（D-022）。
 GITHUB_META_KEYS = ("web", "api", "git", "packages", "copilot")

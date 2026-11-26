@@ -1,486 +1,77 @@
 name = "china"
-description = "Mainland China domains and IP ranges, connected directly"
+description = "Mainland China domains and IP ranges for everyday apps, connected directly"
 order = 20
 
-# 直连数据每次构建从上游同步，不冻结进清单（D-028）。
-[[upstream]]
-kind = "dnsmasq-china-list"
+# 按本人常用场景整理（D-029）：每个常用应用取 v2fly 对应的公司文件，每次构建从上游同步。
 
 [[upstream]]
-kind = "v2fly-geolocation-cn"
+kind = "v2fly"
+file = "tencent"
+apps = "WeChat, QQ"
 
+[[upstream]]
+kind = "v2fly"
+file = "xiaohongshu"
+apps = "Xiaohongshu"
+
+[[upstream]]
+kind = "v2fly"
+file = "alibaba"
+apps = "Alipay, Taobao"
+
+[[upstream]]
+kind = "v2fly"
+file = "unionpay"
+apps = "UnionPay (Yun Shan Fu)"
+
+[[upstream]]
+kind = "v2fly"
+file = "boc"
+apps = "Bank of China"
+
+[[upstream]]
+kind = "v2fly"
+file = "cmb"
+apps = "China Merchants Bank"
+
+[[upstream]]
+kind = "v2fly"
+file = "jd"
+apps = "JD"
+
+[[upstream]]
+kind = "v2fly"
+file = "meituan"
+apps = "Meituan"
+
+[[upstream]]
+kind = "v2fly"
+file = "douyin"
+apps = "Douyin"
+
+[[upstream]]
+kind = "v2fly"
+file = "didi"
+apps = "DiDi"
+
+# iCloud 中国区与 App Store。
+[[upstream]]
+kind = "dnsmasq-apple-china"
+
+# 其余国内流量的 IP 回退（D-006）。
 [[upstream]]
 kind = "china-operator-ip"
 
-# 上游未收录、经人工核实的直连条目写成 [[rule]]（source = "manual"、"observed" 或 "official:<网址>"）。
+[[rule]]
+type = "host-suffix"
+value = "cn"
+source = "manual"
+reason = "mainland country-code TLD; covers 12306.cn and other .cn sites (D-029)"
+
 # 从上游剔除的条目写成 [[exclude]]；反向检查命中但确认应直连的条目写成 [[keep]]，都须写 reason。
 
-# 首次构建反向检查命中的处理（2026-11-26，按本人决定）。
-
-[[exclude]]
-value = "top"
-reason = "generic TLD listed for its Chinese registry; most .top sites are overseas, mainland ones fall back to China IP"
-
-[[exclude]]
-value = "wang"
-reason = "generic TLD listed for its Chinese registry; hits are overseas brand registrations"
-
-[[exclude]]
-value = "moomoo.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "moomooequity.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "moomootrustee.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "tik-tokapi.com"
-reason = "TikTok is not available in mainland China"
-
-[[exclude]]
-value = "tiktokrow-cdn.com"
-reason = "TikTok is not available in mainland China"
-
-[[exclude]]
-value = "likeevideo.ru"
-reason = "Likee serves overseas users only"
-
-[[exclude]]
-value = "likee.video"
-reason = "Likee serves overseas users only"
-
-[[exclude]]
-value = "like.video"
-reason = "Likee serves overseas users only"
-
-[[exclude]]
-value = "joox.com"
-reason = "JOOX serves overseas markets only"
-
-[[exclude]]
-value = "webnovel.com"
-reason = "WebNovel is the overseas edition of Qidian"
-
-[[exclude]]
-value = "inshotapp.com"
-reason = "InShot serves overseas users only"
-
-[[exclude]]
-value = "kimi.ai"
-reason = "overseas edition of Kimi; mainland users use kimi.com and moonshot.cn"
-
-[[exclude]]
-value = "moonshot.ai"
-reason = "overseas edition of Kimi; mainland users use kimi.com and moonshot.cn"
-
-[[exclude]]
-value = "minimax.io"
-reason = "overseas edition of MiniMax; mainland users use minimaxi.com"
-
-[[exclude]]
-value = "lovart.ai"
-reason = "Lovart serves overseas users only"
-
-[[exclude]]
-value = "qoder.com"
-reason = "Qoder serves overseas users; mainland edition is separate"
-
-[[exclude]]
-value = "genshinimpact.com"
-reason = "HoYoverse overseas game servers and accounts"
-
-[[exclude]]
-value = "honkaiimpact3.com"
-reason = "HoYoverse overseas game servers and accounts"
-
-[[exclude]]
-value = "honkaistarrail.com"
-reason = "HoYoverse overseas game servers and accounts"
-
-[[exclude]]
-value = "hoyo.link"
-reason = "HoYoverse overseas game servers and accounts"
-
-[[exclude]]
-value = "hoyoverse.com"
-reason = "HoYoverse overseas game servers and accounts"
-
-[[exclude]]
-value = "zenlesszonezero.com"
-reason = "HoYoverse overseas game servers and accounts"
-
-[[exclude]]
-value = "nikke-de.com"
-reason = "NIKKE overseas game servers"
-
-[[exclude]]
-value = "nikke-en.com"
-reason = "NIKKE overseas game servers"
-
-[[exclude]]
-value = "nikke-fr.com"
-reason = "NIKKE overseas game servers"
-
-[[exclude]]
-value = "nikke-jp.com"
-reason = "NIKKE overseas game servers"
-
-[[exclude]]
-value = "nikke-kr.com"
-reason = "NIKKE overseas game servers"
-
-[[exclude]]
-value = "nikke-sea.com"
-reason = "NIKKE overseas game servers"
-
-[[exclude]]
-value = "yostar.net"
-reason = "Yostar overseas game publishing"
-
-[[exclude]]
-value = "pokemon-unitepgame.com"
-reason = "Pokemon UNITE overseas servers; mainland edition uses Tencent domains"
-
-[[exclude]]
-value = "qtlglb.com"
-reason = "hits are Steam edge nodes outside mainland China"
-
-[[exclude]]
-value = "okaapps.com"
-reason = "overseas apps; only zh.okaapps.com is mainland per v2fly"
-
-[[exclude]]
-value = "sci-hub.ee"
-reason = "Sci-Hub mirror, blocked in mainland China"
-
-[[exclude]]
-value = "binancezh.kim"
-reason = "Binance mirror, blocked in mainland China"
-
-[[exclude]]
-value = "binancezh.link"
-reason = "Binance mirror, blocked in mainland China"
-
-[[exclude]]
-value = "mypikpak.com"
-reason = "PikPak serves overseas users and is blocked in mainland China"
-
-[[exclude]]
-value = "mypikpak.net"
-reason = "PikPak serves overseas users and is blocked in mainland China"
-
-[[exclude]]
-value = "pikpak.me"
-reason = "PikPak serves overseas users and is blocked in mainland China"
-
-[[exclude]]
-value = "pikpakdrive.com"
-reason = "PikPak serves overseas users and is blocked in mainland China"
-
-[[exclude]]
-value = "cnpmjs.org"
-reason = "retired npm mirror hosted overseas"
-
-[[exclude]]
-value = "cnbetacdn.com"
-reason = "listed as overseas by v2fly"
-
-[[exclude]]
-value = "maa.plus"
-reason = "MAA project sites hosted overseas"
-
-[[exclude]]
-value = "prts.plus"
-reason = "MAA project sites hosted overseas"
-
-[[exclude]]
-value = "n0vadesktop.com"
-reason = "HoYoverse N0vaDesktop overseas edition"
-
-[[exclude]]
-value = "91cy.app"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "99thz.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "aa77kk.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "age.tv"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "agedm.app"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "agefans.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "asmr.gay"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "avstar4.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "cxacg.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "eilieili.cc"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "fi11.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "footseen.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "hshsxkj.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "huati.cc"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "igkbroker.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "jhxl.org"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "mangafuna.xyz"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "omobi.cc"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "picacgp.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "sifangclub.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "tantaly.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "thzu.cc"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "xn--2vxsp6vi4j.com"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "xn--sgt856gbjl.cc"
-reason = "anime, piracy or adult site hosted overseas"
-
-[[exclude]]
-value = "yantaqu.com"
-reason = "anime, piracy or adult site hosted overseas"
-
+# 手写的 host-suffix, cn 同样会被 geolocation-!cn 中境外公司的 .cn 域名命中（如 scholar.google.cn），
+# 沿用首次构建时本人的决定：.cn 整体直连。
 [[keep]]
 value = "cn"
 reason = "mainland country-code TLD; overseas companies' .cn sites are reachable directly"
-
-[[keep]]
-value = "xn--fiqs8s"
-reason = "mainland country-code TLD; overseas companies' .cn sites are reachable directly"
-
-[[keep]]
-value = "xn--55qx5d"
-reason = "CNNIC-run Chinese-language TLD used mostly by mainland sites"
-
-[[keep]]
-value = "xn--io0a7i"
-reason = "CNNIC-run Chinese-language TLD used mostly by mainland sites"
-
-[[keep]]
-value = "aliyuncs.com"
-reason = "Alibaba Cloud services used by mainland apps"
-
-[[keep]]
-value = "alicloud.com"
-reason = "Alibaba Cloud services used by mainland apps"
-
-[[keep]]
-value = "alibabacloud.com"
-reason = "Alibaba Cloud international site, reachable from mainland and shares mainland infrastructure"
-
-[[keep]]
-value = "ctyun.online"
-reason = "China Telecom cloud"
-
-[[keep]]
-value = "quantil.com"
-reason = "ChinaNetCenter (Wangsu) CDN"
-
-[[keep]]
-value = "miniso.com"
-reason = "MINISO, mainland retailer"
-
-[[exclude]]
-value = "futu5.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futuau.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futuesop.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futufin.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futuhn.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futuniuniu.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futunn.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "futustatic.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "fututrade.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "itiger.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "itigergrowth.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "itigergrowtha.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "itigerup.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "laohu8.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "tigerbbs.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "xiaohu8.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "longbridgeapp.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "longbridgehk.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "lbctrl.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "lbkrs.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[exclude]]
-value = "wbrks.com"
-reason = "not used; domestic endpoints fall back to China IP ranges"
-
-[[keep]]
-value = "hp-ww.com"
-reason = "HP sites reachable from mainland China"
-
-[[keep]]
-value = "hp.com"
-reason = "HP sites reachable from mainland China"
-
-[[keep]]
-value = "hpconnected.com"
-reason = "HP sites reachable from mainland China"
-
-[[keep]]
-value = "hpstore-china.com"
-reason = "HP sites reachable from mainland China"
-
-[[keep]]
-value = "microsoftuwp.com"
-reason = "Microsoft service reachable from mainland China"
-
-[[keep]]
-value = "galaxyappstore.com"
-reason = "Samsung Galaxy Store, available in mainland China"
-
-[[keep]]
-value = "calgoncarbon-china.com"
-reason = "Calgon Carbon China site"
-
-[[keep]]
-value = "acs.org"
-reason = "American Chemical Society publications, reachable from mainland universities"
-
-[[keep]]
-value = "ccb.com"
-reason = "China Construction Bank; hit is its overseas branch site ru.ccb.com"
-
-[[keep]]
-value = "hsbc.com.cn"
-reason = "HSBC China; v2fly lists it in both geolocation-cn and geolocation-!cn"
-
-[[keep]]
-value = "hsbcqh.com.cn"
-reason = "HSBC China; v2fly lists it in both geolocation-cn and geolocation-!cn"
-
-[[keep]]
-value = "hsbcinsurance.com.cn"
-reason = "HSBC China; v2fly lists it in both geolocation-cn and geolocation-!cn"
-
-[[keep]]
-value = "cdn20.com"
-reason = "ChinaNetCenter (Wangsu) CDN with mainland name servers; licdn.cn.cdn20.com no longer resolves"
-
-[[keep]]
-value = "kuke.com"
-reason = "Kuke Music, Beijing; Alibaba DNS and an Alibaba Cloud Beijing address"
-
-[[keep]]
-value = "nike.host"
-reason = "registered in Beijing, parked on Alibaba Cloud; not Nike"

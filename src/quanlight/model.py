@@ -24,12 +24,26 @@ class Note:
 
 
 @dataclass(frozen=True)
+class UpstreamSpec:
+    """清单中的一个 [[upstream]]；kind 为 v2fly 时 file 指 v2fly 数据文件，apps 写它服务的常用应用。"""
+
+    kind: str
+    file: str | None = None
+    apps: str | None = None
+
+    @property
+    def key(self) -> str:
+        """构建内部与产物文件头使用的数据源名。"""
+        return f"{self.kind}:{self.file}" if self.file else self.kind
+
+
+@dataclass(frozen=True)
 class Bundle:
     name: str
     description: str
     order: int
     rules: tuple[Rule, ...]
-    upstream: tuple[str, ...] = ()
+    upstream: tuple[UpstreamSpec, ...] = ()
     exclude: tuple[Note, ...] = ()
     keep: tuple[Note, ...] = ()
 

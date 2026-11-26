@@ -1,4 +1,5 @@
 # 模拟订阅后的期望去向：apns（APNs 包，强制代理）、direct（china 直连列表）、final（未命中，代理托底）。
+# 每个常用应用至少一条主机应直连（D-029）。
 
 [[sample]]
 host = "courier.push.apple.com"
@@ -9,12 +10,8 @@ host = "1-courier.push.apple.com"
 expect = "apns"
 
 [[sample]]
-host = "www.taobao.com"
-expect = "direct"
-
-[[sample]]
-host = "g.alicdn.com"
-expect = "direct"
+host = "init-p01st.push.apple.com"
+expect = "apns"
 
 [[sample]]
 host = "weixin.qq.com"
@@ -22,6 +19,22 @@ expect = "direct"
 
 [[sample]]
 host = "dns.weixin.qq.com"
+expect = "direct"
+
+[[sample]]
+host = "szextshort.weixin.qq.com"
+expect = "direct"
+
+[[sample]]
+host = "im.qq.com"
+expect = "direct"
+
+[[sample]]
+host = "www.xiaohongshu.com"
+expect = "direct"
+
+[[sample]]
+host = "edith.xiaohongshu.com"
 expect = "direct"
 
 [[sample]]
@@ -33,19 +46,71 @@ host = "mobilegw.alipay.com"
 expect = "direct"
 
 [[sample]]
-host = "api.bilibili.com"
+host = "www.taobao.com"
 expect = "direct"
 
 [[sample]]
-host = "www.bilibili.com"
+host = "g.alicdn.com"
 expect = "direct"
 
 [[sample]]
-host = "www.baidu.com"
+host = "www.95516.com"
+expect = "direct"
+
+[[sample]]
+host = "wallet.95516.com"
+expect = "direct"
+
+[[sample]]
+host = "www.boc.cn"
+expect = "direct"
+
+[[sample]]
+host = "www.cmbchina.com"
+expect = "direct"
+
+[[sample]]
+host = "www.jd.com"
+expect = "direct"
+
+[[sample]]
+host = "api.m.jd.com"
+expect = "direct"
+
+[[sample]]
+host = "www.meituan.com"
+expect = "direct"
+
+[[sample]]
+host = "www.douyin.com"
+expect = "direct"
+
+[[sample]]
+host = "common.diditaxi.com.cn"
 expect = "direct"
 
 [[sample]]
 host = "www.12306.cn"
+expect = "direct"
+
+[[sample]]
+host = "kyfw.12306.cn"
+expect = "direct"
+
+[[sample]]
+host = "www.icloud.com.cn"
+expect = "direct"
+
+[[sample]]
+host = "apps.apple.com"
+expect = "direct"
+
+[[sample]]
+host = "is1-ssl.mzstatic.com"
+expect = "direct"
+
+[[sample]]
+host = "api.didichuxing.com"
 expect = "direct"
 
 [[sample]]

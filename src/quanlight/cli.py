@@ -10,10 +10,10 @@ from . import fetch
 from .build import CheckData, Upstream, build, read_previous_counts
 from .emit import PROBE_CASES, render_probe, render_probe_profile
 from .manifest import ManifestError, load_bundles
-from .model import Rule
+from .model import Rule, UpstreamSpec
 from .sources import (
     CHINA_IP_REPO,
-    DNSMASQ_REPO,
+    DNSMASQ_APPLE_REPO,
     GITHUB_META_URL,
     GOOGLE_IPRANGES_URL,
     TELEGRAM_CIDR_URL,
@@ -30,7 +30,6 @@ from .v2fly import V2flyError, expand, foreign_domains, import_direct
 DEFAULT_OWNER = "svbmwjwj"
 DEFAULT_REPO = "quanlight"
 DEFAULT_BASE_URL = f"https://raw.githubusercontent.com/{DEFAULT_OWNER}/{DEFAULT_REPO}/release"
-DIRECT_DATA_FILE = "geolocation-cn"
 FOREIGN_DATA_FILE = "geolocation-!cn"
 
 
@@ -45,27 +44,28 @@ def _ip_rules(text: str, what: str, source: str) -> list[Rule]:
     ]
 
 
-def _sync_upstream(kinds: set[str], v2fly_dir: Path, v2fly_version: str) -> dict[str, Upstream]:
-    """下载并解析清单声明的直连数据源。"""
+def _sync_upstream(specs: list[UpstreamSpec], v2fly_dir: Path, v2fly_version: str) -> dict[str, Upstream]:
+    """下载并解析清单声明的直连数据源，键为 UpstreamSpec.key。"""
     out: dict[str, Upstream] = {}
-    if "dnsmasq-china-list" in kinds:
-        text = fetch.fetch_text(DNSMASQ_REPO["url"])
-        rules = [Rule("host-suffix", d, "dnsmasq-china-list") for d in parse_dnsmasq(text)]
-        out["dnsmasq-china-list"] = Upstream(
-            "dnsmasq-china-list", fetch.fetch_commit(DNSMASQ_REPO["repo"], DNSMASQ_REPO["branch"]), rules
-        )
-    if "v2fly-geolocation-cn" in kinds:
-        result = import_direct(expand(v2fly_dir, DIRECT_DATA_FILE), source=f"v2fly:{DIRECT_DATA_FILE}")
-        skipped: dict[str, list[str]] = {}
-        for entry, reason in result.skipped:
-            skipped.setdefault(reason, []).append(entry.value)
-        out["v2fly-geolocation-cn"] = Upstream("v2fly-geolocation-cn", v2fly_version, result.rules, skipped)
-    if "china-operator-ip" in kinds:
-        rules = _ip_rules(fetch.fetch_text(CHINA_IP_REPO["v4"]), "china-operator-ip v4", "china-operator-ip")
-        rules += _ip_rules(fetch.fetch_text(CHINA_IP_REPO["v6"]), "china-operator-ip v6", "china-operator-ip")
-        out["china-operator-ip"] = Upstream(
-            "china-operator-ip", fetch.fetch_commit(CHINA_IP_REPO["repo"], CHINA_IP_REPO["branch"]), rules
-        )
+    for spec in specs:
+        if spec.key in out:
+            continue
+        if spec.kind == "v2fly" and spec.file:
+            result = import_direct(expand(v2fly_dir, spec.file), source=f"v2fly:{spec.file}")
+            skipped: dict[str, list[str]] = {}
+            for entry, reason in result.skipped:
+                skipped.setdefault(reason, []).append(entry.value)
+            out[spec.key] = Upstream(spec.key, v2fly_version, result.rules, skipped)
+        elif spec.kind == "dnsmasq-apple-china":
+            text = fetch.fetch_text(DNSMASQ_APPLE_REPO["url"])
+            rules = [Rule("host-suffix", d, spec.key) for d in parse_dnsmasq(text)]
+            version = fetch.fetch_commit(DNSMASQ_APPLE_REPO["repo"], DNSMASQ_APPLE_REPO["branch"])
+            out[spec.key] = Upstream(spec.key, version, rules)
+        elif spec.kind == "china-operator-ip":
+            rules = _ip_rules(fetch.fetch_text(CHINA_IP_REPO["v4"]), "china-operator-ip v4", spec.key)
+            rules += _ip_rules(fetch.fetch_text(CHINA_IP_REPO["v6"]), "china-operator-ip v6", spec.key)
+            version = fetch.fetch_commit(CHINA_IP_REPO["repo"], CHINA_IP_REPO["branch"])
+            out[spec.key] = Upstream(spec.key, version, rules)
     return out
 
 
@@ -92,10 +92,10 @@ def _load_check_data(v2fly_dir: Path, v2fly_version: str) -> CheckData:
 
 def _cmd_build(args: argparse.Namespace) -> int:
     try:
-        kinds = {kind for b in load_bundles(args.bundles) for kind in b.upstream}
+        specs = [spec for b in load_bundles(args.bundles) for spec in b.upstream]
         v2fly_dir = fetch.fetch_v2fly_data(args.cache / "v2fly", V2FLY_REPO["url"])
         v2fly_version = fetch.fetch_commit(V2FLY_REPO["repo"], V2FLY_REPO["branch"])
-        upstream = _sync_upstream(kinds, v2fly_dir, v2fly_version)
+        upstream = _sync_upstream(specs, v2fly_dir, v2fly_version)
         data = _load_check_data(v2fly_dir, v2fly_version)
     except (fetch.FetchError, SourceError, V2flyError, ManifestError, KeyError) as exc:
         print(f"error: {exc}", file=sys.stderr)
