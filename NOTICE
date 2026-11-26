@@ -1,0 +1,19 @@
+quanlight
+Copyright (c) 2026 svbmwjwj
+Licensed under the MIT License (see LICENSE).
+
+The published filter lists include data derived from the following sources.
+
+v2fly/domain-list-community
+https://github.com/v2fly/domain-list-community
+MIT License, Copyright (c) 2018-2019 V2Ray
+Entries were imported, re-typed and reviewed by hand; the original
+attribution is kept in each rule's "source" field in the manifests.
+
+Telegram server networks
+https://core.telegram.org/resources/cidr.txt
+Published by Telegram; synced on every build.
+
+Check data (used only to detect mis-routing, never included in the lists):
+felixonmars/dnsmasq-china-list (WTFPL),
+gaoyifan/china-operator-ip (MIT).
