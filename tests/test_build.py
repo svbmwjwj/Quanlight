@@ -42,7 +42,8 @@ def setup(tmp_path: Path, extra_rule: Rule | None = None, samples: str | None = 
         data=data,
         upstream={"telegram-cidr": TG_CIDR},
         samples=samples_path,
-        base_url="https://cdn.example/q@release",
+        owner="owner",
+        repo="quanlight",
         static_files=(),
     )
 
@@ -57,7 +58,9 @@ def test_build_writes_lists(tmp_path):
     telegram = (out / "ios" / "telegram.list").read_text()
     assert "ip-cidr, 91.108.56.0/22, telegram" in telegram
     assert "ip6-cidr, 2001:b28:f23d::/48, telegram" in telegram
-    assert "/ios/telegram.list" in (out / "README.md").read_text()
+    readme = (out / "README.md").read_text()
+    assert "https://raw.githubusercontent.com/owner/quanlight/release/ios/telegram.list" in readme
+    assert "https://ghfast.top/" in readme
     assert report.counts["telegram"] == 5
 
 

@@ -16,10 +16,18 @@ domains or networks before anything is published.
 
 ## Subscribe
 
-Lists are published on the `release` branch:
+Lists are published on the `release` branch. Use the GitHub link where it is
+reachable and a mainland-friendly mirror otherwise; all serve the same files:
 
-- `https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release/ios/<name>.list`
-- Fallback: `https://raw.githubusercontent.com/svbmwjwj/quanlight/release/ios/<name>.list`
+| Mirror | Base URL |
+|---|---|
+| GitHub | `https://raw.githubusercontent.com/svbmwjwj/quanlight/release` |
+| Mainland China (ghfast.top, a third-party GitHub proxy) | `https://ghfast.top/https://raw.githubusercontent.com/svbmwjwj/quanlight/release` |
+| jsDelivr (Fastly) | `https://fastly.jsdelivr.net/gh/svbmwjwj/quanlight@release` |
+| jsDelivr | `https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release` |
+
+Append `/ios/<name>.list` to a base URL. A third-party proxy can see and
+alter what it serves; prefer GitHub or jsDelivr when they work for you.
 
 The release branch's `README.md` contains a ready-to-paste `[filter_remote]`
 snippet in the correct order. Every line needs a `force-policy`: replace

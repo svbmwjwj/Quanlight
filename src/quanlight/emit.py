@@ -74,3 +74,45 @@ def render_probe(case: str, base_url: str) -> dict[str, str]:
         snippet.append(f"{base}/{name}, tag=probe-{case}-{i}, force-policy={policy}, enabled=true")
     files[f"probe-{case}.conf"] = "\n".join(snippet) + "\n"
     return files
+
+
+def mirror_bases(owner: str, repo: str) -> dict[str, str]:
+    """Base URLs of the release branch: GitHub itself plus mainland-friendly mirrors."""
+    raw = f"https://raw.githubusercontent.com/{owner}/{repo}/release"
+    return {
+        "github": raw,
+        "ghfast": f"https://ghfast.top/{raw}",
+        "jsdelivr-fastly": f"https://fastly.jsdelivr.net/gh/{owner}/{repo}@release",
+        "jsdelivr": f"https://cdn.jsdelivr.net/gh/{owner}/{repo}@release",
+    }
+
+
+def render_release_readme(bundles: Sequence[Bundle], owner: str, repo: str) -> str:
+    bases = mirror_bases(owner, repo)
+    lines = [
+        "# quanlight lists",
+        "",
+        f"Built from https://github.com/{owner}/{repo}. Replace `<proxy-policy>` with your own policy names.",
+        "",
+        "## Base URLs",
+        "",
+        f"- GitHub: `{bases['github']}`",
+        f"- Mainland China (GitHub proxy, third party): `{bases['ghfast']}`",
+        f"- jsDelivr (Fastly): `{bases['jsdelivr-fastly']}`",
+        f"- jsDelivr: `{bases['jsdelivr']}`",
+        "",
+        "## Subscribe from GitHub",
+        "",
+        "```",
+        "[filter_remote]",
+        render_filter_remote(bundles, bases["github"]).rstrip("\n"),
+        "```",
+        "",
+        "## Subscribe from mainland China",
+        "",
+        "```",
+        "[filter_remote]",
+        render_filter_remote(bundles, bases["ghfast"]).rstrip("\n"),
+        "```",
+    ]
+    return "\n".join(lines) + "\n"

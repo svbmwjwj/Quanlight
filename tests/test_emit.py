@@ -40,3 +40,22 @@ def test_render_filter_remote():
     assert "/ios/apns.list," in lines[1] and "/ios/telegram.list," in lines[2]
     assert all("force-policy=<proxy-policy>" in l for l in lines[1:3])
     assert lines[-1].startswith("FILTER_LAN,")
+
+
+def test_mirror_bases_cover_github_and_mainland():
+    from quanlight.emit import mirror_bases
+
+    bases = mirror_bases("owner", "quanlight")
+    assert bases["github"] == "https://raw.githubusercontent.com/owner/quanlight/release"
+    assert bases["ghfast"] == "https://ghfast.top/https://raw.githubusercontent.com/owner/quanlight/release"
+    assert bases["jsdelivr-fastly"] == "https://fastly.jsdelivr.net/gh/owner/quanlight@release"
+    assert bases["jsdelivr"] == "https://cdn.jsdelivr.net/gh/owner/quanlight@release"
+
+
+def test_render_release_readme_has_both_snippets():
+    from quanlight.emit import render_release_readme
+
+    text = render_release_readme([Bundle("apns", "d", 10, ())], "owner", "quanlight")
+    assert "https://raw.githubusercontent.com/owner/quanlight/release/ios/apns.list" in text
+    assert "https://ghfast.top/https://raw.githubusercontent.com/owner/quanlight/release/ios/apns.list" in text
+    assert text.count("[filter_remote]") == 2

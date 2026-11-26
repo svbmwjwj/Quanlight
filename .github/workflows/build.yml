@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      BASE_URL: https://cdn.jsdelivr.net/gh/${{ github.repository }}@release
+      BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/release
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
       - name: Unit tests
         run: uv run pytest -q
       - name: Build and check lists
-        run: uv run quanlight build --out dist --base-url "$BASE_URL"
+        run: uv run quanlight build --out dist --owner "${{ github.repository_owner }}" --repo "${{ github.event.repository.name }}"
       - name: Probe lists
         run: uv run quanlight probe --out dist/probe --base-url "$BASE_URL"
       - name: Publish to release branch

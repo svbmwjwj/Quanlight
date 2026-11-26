@@ -15,7 +15,7 @@ from pathlib import Path
 
 from . import fetch
 from .check import build_ios_lists, cross_check, direct_exceptions, find_misfires
-from .emit import PROBE_CASES, render_filter_remote, render_list, render_probe
+from .emit import PROBE_CASES, render_list, render_probe, render_release_readme
 from .manifest import check_bundle_files, dump_bundle, load_bundles, validate_bundle
 from .match import IPNetwork, route
 from .model import Bundle, Rule
@@ -30,7 +30,9 @@ from .sources import (
 from .v2fly import diff, expand, to_rules
 
 OUTPUT_MARKER = ".quanlight-dist"  # marks a directory this tool may replace
-DEFAULT_BASE_URL = "https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release"
+DEFAULT_OWNER = "svbmwjwj"
+DEFAULT_REPO = "quanlight"
+DEFAULT_BASE_URL = f"https://raw.githubusercontent.com/{DEFAULT_OWNER}/{DEFAULT_REPO}/release"
 UPSTREAM_PARSERS: dict[str, Callable[[str, str], list[Rule]]] = {"telegram-cidr": parse_telegram_cidr}
 
 
@@ -108,7 +110,8 @@ def build(
     data: CheckData,
     upstream: Mapping[str, str],
     samples: Path | None,
-    base_url: str,
+    owner: str,
+    repo: str,
     static_files: Sequence[Path],
 ) -> BuildReport:
     report = BuildReport(provenance=dict(data.provenance))
@@ -143,11 +146,7 @@ def build(
     for lst in lists:
         text = render_list(lst.name, lst.rules, list_provenance.get(lst.name, {}))
         (out_dir / "ios" / f"{lst.name}.list").write_text(text, encoding="utf-8")
-    snippet = render_filter_remote(bundles, base_url)
-    readme = (
-        "# quanlight lists\n\nGenerated from https://github.com/svbmwjwj/quanlight. "
-        "Replace `<proxy-policy>` with your own policy names.\n\n```\n[filter_remote]\n" + snippet + "```\n"
-    )
+    readme = render_release_readme(bundles, owner, repo)
     (out_dir / "README.md").write_text(readme, encoding="utf-8")
     for path in static_files:
         shutil.copy(path, out_dir / path.name)
@@ -181,7 +180,8 @@ def _cmd_build(args: argparse.Namespace) -> int:
         data=data,
         upstream=upstream,
         samples=args.samples,
-        base_url=args.base_url,
+        owner=args.owner,
+        repo=args.repo,
         static_files=[p for p in (root / "LICENSE", root / "NOTICE") if p.is_file()],
     )
     markdown = report.to_markdown()
@@ -247,7 +247,8 @@ def main(argv: list[str] | None = None) -> int:
     p_build.add_argument("--bundles", type=Path, default=Path("bundles"))
     p_build.add_argument("--out", type=Path, default=Path("dist"))
     p_build.add_argument("--samples", type=Path, default=Path("tests/samples.toml"))
-    p_build.add_argument("--base-url", default=DEFAULT_BASE_URL)
+    p_build.add_argument("--owner", default=DEFAULT_OWNER)
+    p_build.add_argument("--repo", default=DEFAULT_REPO)
     p_build.set_defaults(func=_cmd_build)
 
     p_import = sub.add_parser("import-v2fly", help="draft a bundle manifest from a v2fly data file")
