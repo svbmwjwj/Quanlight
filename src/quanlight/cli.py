@@ -15,7 +15,7 @@ from pathlib import Path
 
 from . import fetch
 from .check import build_ios_lists, cross_check, direct_exceptions, find_misfires
-from .emit import PROBE_CASES, render_list, render_probe, render_release_readme
+from .emit import PROBE_CASES, render_list, render_probe, render_probe_profile, render_release_readme
 from .manifest import check_bundle_files, dump_bundle, load_bundles, validate_bundle
 from .match import IPNetwork, route
 from .model import Bundle, Rule
@@ -235,6 +235,8 @@ def _cmd_probe(args: argparse.Namespace) -> int:
     for case in PROBE_CASES:
         for name, text in render_probe(case, args.base_url.rstrip("/") + "/probe").items():
             (args.out / name).write_text(text, encoding="utf-8")
+    for name, text in render_probe_profile().items():
+        (args.out / name).write_text(text, encoding="utf-8")
     return 0
 
 

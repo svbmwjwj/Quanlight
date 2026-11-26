@@ -25,7 +25,7 @@ def test_probe_conflict_cases_pair_reject_with_direct():
         snippet = render_probe(case, "https://x/probe")[f"probe-{case}.conf"]
         assert remote_policies(snippet) == ["reject", "direct"]
     local = render_probe("local", "https://x/probe")["probe-local.conf"]
-    assert "host, www.example.com, direct" in local
+    assert "host, www.example.net, direct" in local
     assert remote_policies(local) == ["reject"]
 
 
@@ -36,3 +36,24 @@ def test_probe_command_writes_all_files(tmp_path):
     assert (tmp_path / "probe-order.conf").is_file()
     assert "https://x/probe/probe-type-1.list" in (tmp_path / "probe-type.conf").read_text()
     assert len(list(tmp_path.glob("*.list"))) == 7
+
+
+def test_probe_profile_serves_lists_from_local_backend():
+    from quanlight.emit import PROBE_CASES, render_probe_profile
+
+    files = render_probe_profile()
+    profile = files["quanlight-probe.conf"]
+    script = files["quanlight-probe.js"]
+    assert "[http_backend]\nquanlight-probe.js, tag=quanlight-probe, path=^/quanlight-probe/, enabled=true" in profile
+    assert "http://127.0.0.1:9999/quanlight-probe/order-1.list, tag=order-1, force-policy=reject" in profile
+    assert "final, direct" in profile and "host, www.example.net, direct" in profile
+    assert "[server_local]" in profile and "server=" not in profile
+    assert '"order-1.list": "host-suffix, example.com, order-1\\n"' in script
+    assert "$done(" in script
+
+
+def test_probe_cases_use_distinct_hosts():
+    from quanlight.emit import PROBE_CASES
+
+    first_hosts = [visit[0] for _, _, visit in PROBE_CASES.values()]
+    assert len(set(first_hosts)) == len(first_hosts)

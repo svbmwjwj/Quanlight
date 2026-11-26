@@ -1,5 +1,6 @@
 """渲染 Quantumult X 分流列表与 [filter_remote] 订阅片段。"""
 
+import json
 from collections.abc import Mapping, Sequence
 
 from .model import RULE_TYPES, Bundle, Rule
@@ -38,19 +39,19 @@ PROBE_CASES: dict[str, tuple[list[tuple[str, str, str]], str | None, list[str]]]
         ["www.example.com"],
     ),
     "type": (
-        [("host-suffix", "example.com", "reject"), ("host", "www.example.com", "direct")],
+        [("host-suffix", "example.org", "reject"), ("host", "www.example.org", "direct")],
         None,
-        ["www.example.com"],
+        ["www.example.org"],
     ),
     "local": (
-        [("host", "www.example.com", "reject")],
-        "host, www.example.com, direct",
-        ["www.example.com"],
+        [("host", "www.example.net", "reject")],
+        "host, www.example.net, direct",
+        ["www.example.net"],
     ),
     "wildcard": (
-        [("host-wildcard", "*.example.com", "reject")],
+        [("host-wildcard", "*.iana.org", "reject")],
         None,
-        ["www.example.com", "example.com"],
+        ["www.iana.org", "iana.org"],
     ),
     "cname": (
         [("host", "www.microsoft.com-c-3.edgekey.net", "reject")],
@@ -58,6 +59,9 @@ PROBE_CASES: dict[str, tuple[list[tuple[str, str, str]], str | None, list[str]]]
         ["www.microsoft.com"],
     ),
 }
+
+PROBE_PORT = 9999
+PROBE_PATH = "quanlight-probe"
 
 
 def render_probe(case: str, base_url: str) -> dict[str, str]:
@@ -74,6 +78,71 @@ def render_probe(case: str, base_url: str) -> dict[str, str]:
         snippet.append(f"{base}/{name}, tag=probe-{case}-{i}, force-policy={policy}, enabled=true")
     files[f"probe-{case}.conf"] = "\n".join(snippet) + "\n"
     return files
+
+
+def render_probe_profile() -> dict[str, str]:
+    """生成可单独切换使用的探针配置，以及在本机 http_backend 上提供探针列表的脚本。"""
+    lists: dict[str, str] = {}
+    remote: list[str] = []
+    local: list[str] = []
+    for case, (rules, local_rule, visit) in PROBE_CASES.items():
+        remote.append(f"# {case}: open " + ", ".join(visit))
+        for i, (type_, value, policy) in enumerate(rules, start=1):
+            name = f"{case}-{i}"
+            lists[f"{name}.list"] = f"{type_}, {value}, {name}\n"
+            remote.append(
+                f"http://127.0.0.1:{PROBE_PORT}/{PROBE_PATH}/{name}.list, tag={name}, force-policy={policy}, enabled=true"
+            )
+        if local_rule:
+            local.append(local_rule)
+    profile = "\n".join(
+        [
+            "# Quanlight 匹配语义探针配置：只含探针规则，不含节点与私人信息。",
+            "# 测完请切回原来的配置。",
+            "",
+            "[general]",
+            "server_check_url = http://cp.cloudflare.com/generate_204",
+            "",
+            "[dns]",
+            "no-system",
+            "doh-server = https://223.5.5.5/dns-query",
+            "",
+            "[policy]",
+            "",
+            "[server_remote]",
+            "",
+            "[filter_remote]",
+            *remote,
+            "",
+            "[rewrite_remote]",
+            "",
+            "[server_local]",
+            "",
+            "[filter_local]",
+            *local,
+            "final, direct",
+            "",
+            "[rewrite_local]",
+            "",
+            "[task_local]",
+            "",
+            "[http_backend]",
+            f"quanlight-probe.js, tag=quanlight-probe, path=^/{PROBE_PATH}/, enabled=true",
+            "",
+            "[mitm]",
+        ]
+    ) + "\n"
+    entries = ",\n".join(f"  {json.dumps(k)}: {json.dumps(v)}" for k, v in lists.items())
+    script = (
+        "// Quanlight 探针后端：按路径返回探针列表。\n"
+        f"const lists = {{\n{entries}\n}};\n"
+        "const name = $request.path.split(\"/\").pop();\n"
+        "const body = lists[name];\n"
+        "$done(body === undefined\n"
+        "  ? { status: \"HTTP/1.1 404 Not Found\", headers: { Connection: \"Close\" }, body: \"not found\\n\" }\n"
+        "  : { status: \"HTTP/1.1 200 OK\", headers: { \"Content-Type\": \"text/plain\", Connection: \"Close\" }, body: body });\n"
+    )
+    return {"quanlight-probe.conf": profile, "quanlight-probe.js": script}
 
 
 def mirror_bases(owner: str, repo: str) -> dict[str, str]:
