@@ -63,3 +63,23 @@ expect = "youtube"
 [[sample]]
 host = "www.bilibili.com"
 expect = "direct"
+
+[[sample]]
+host = "www.google.com"
+expect = "google"
+
+[[sample]]
+host = "mail.google.com"
+expect = "google"
+
+[[sample]]
+host = "play.googleapis.com"
+expect = "google"
+
+[[sample]]
+host = "googleapis.cn"
+expect = "direct"
+
+[[sample]]
+host = "c.android.clients.google.com"
+expect = "direct"
