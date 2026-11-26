@@ -27,15 +27,15 @@ reason = "generic TLD listed for its Chinese registry; hits are overseas brand r
 
 [[exclude]]
 value = "moomoo.com"
-reason = "moomoo serves overseas users only"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
 [[exclude]]
 value = "moomooequity.com"
-reason = "moomoo serves overseas users only"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
 [[exclude]]
 value = "moomootrustee.com"
-reason = "moomoo serves overseas users only"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
 [[exclude]]
 value = "tik-tokapi.com"
@@ -341,89 +341,89 @@ reason = "ChinaNetCenter (Wangsu) CDN"
 value = "miniso.com"
 reason = "MINISO, mainland retailer"
 
-[[keep]]
+[[exclude]]
 value = "futu5.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futuau.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futuesop.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futufin.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futuhn.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futuniuniu.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futunn.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "futustatic.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "fututrade.com"
-reason = "Futu; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "itiger.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "itigergrowth.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "itigergrowtha.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "itigerup.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "laohu8.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "tigerbbs.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "xiaohu8.com"
-reason = "Tiger Brokers; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "longbridgeapp.com"
-reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "longbridgehk.com"
-reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "lbctrl.com"
-reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "lbkrs.com"
-reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
-[[keep]]
+[[exclude]]
 value = "wbrks.com"
-reason = "Longbridge; mainland edition assumed for now, pending owner confirmation"
+reason = "not used; domestic endpoints fall back to China IP ranges"
 
 [[keep]]
 value = "hp-ww.com"
