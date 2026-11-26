@@ -148,3 +148,10 @@ updated: 2026-11-26
 - D-025 分支仍未合并；合并时设计文档里“后三者之间的先后”一句改按 D-025 标注。
 - 真机观测改为：内存验证、国内应用命中 `final` 的排查、Telegram 推送；原先的 Claude 包收窄不再需要。
 - 旧对话 `quanlight-next`、`device-observation` 与“iOS代理托底规则设计 (fork)”已归档；四个 worktree 仍在。
+
+## 2026-11-26（按常用场景整理直连规则）
+
+- 决定：直连规则改为按本人常用应用整理（D-029，取代 D-028 宽口径）；国际站与海外业务不直连；Apple 除推送外全部直连。
+- 已合并：构建器改造（分支 `claude/proxy-fallback-whitelist-8db3f3`，至 `2eb64fe`）；`china.list` 约 1.2 万条（域名约 2400、大陆网段 9685）、约 400 KB；`apns.list` 1 条。
+- 本人自行做真机测试；首次发布在 Actions 手动运行 `build` 并勾选 `publish`。
+- 未做：D-025 分支合并、旧 worktree 清理。
