@@ -31,7 +31,7 @@ from .v2fly import diff, expand, to_rules
 
 OUTPUT_MARKER = ".quanlight-dist"  # 标记本工具可以整体替换的输出目录
 DEFAULT_OWNER = "svbmwjwj"
-DEFAULT_REPO = "Quanlight"
+DEFAULT_REPO = "quanlight"
 DEFAULT_BASE_URL = f"https://raw.githubusercontent.com/{DEFAULT_OWNER}/{DEFAULT_REPO}/release"
 UPSTREAM_PARSERS: dict[str, Callable[[str, str], list[Rule]]] = {"telegram-cidr": parse_telegram_cidr}
 

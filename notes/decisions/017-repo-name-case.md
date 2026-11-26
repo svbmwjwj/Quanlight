@@ -13,7 +13,7 @@ doc: notes/rule-repo-design.md
 
 ## 决定
 
-GitHub 仓库名为 `Quanlight`。本地开发目录 `~/Developer/quanlight`、本机数据目录 `~/.config/quanlight/` 与 Python 包名 `quanlight` 保持小写。
+GitHub 仓库名为 `Quanlight`，但订阅链接、模板与文档中的地址一律写小写 `quanlight`（GitHub 与 jsDelivr 的地址不区分仓库名大小写）。本地开发目录 `~/Developer/quanlight`、本机数据目录 `~/.config/quanlight/` 与 Python 包名 `quanlight` 保持小写。
 
 ## 被推翻的原判断
 
@@ -25,4 +25,4 @@ D-001 把仓库、本地开发目录与本机数据目录统一命名为全小�
 
 ## 缘由
 
-用户要求仓库名首字母大写。本地目录与包名保持小写由 Claude 决定，以遵循命名规则与 Python 包名惯例。
+用户要求仓库名首字母大写，链接保持小写。本地目录与包名保持小写由 Claude 决定，以遵循命名规则与 Python 包名惯例。

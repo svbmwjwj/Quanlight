@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/release
+      BASE_URL: https://raw.githubusercontent.com/${{ github.repository_owner }}/quanlight/release
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
       - name: Unit tests
         run: uv run pytest -q
       - name: Build and check lists
-        run: uv run quanlight build --out dist --owner "${{ github.repository_owner }}" --repo "${{ github.event.repository.name }}"
+        run: uv run quanlight build --out dist --owner "${{ github.repository_owner }}" --repo quanlight
       - name: Probe lists
         run: uv run quanlight probe --out dist/probe --base-url "$BASE_URL"
       - name: Publish to release branch
@@ -47,5 +47,5 @@ jobs:
               commit -q -m "release: lists from ${GITHUB_SHA::7}"
           git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" release
           git ls-files | while read -r path; do
-            curl -fsS -o /dev/null "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@release/${path}" || echo "purge failed: $path"
+            curl -fsS -o /dev/null "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY_OWNER}/quanlight@release/${path}" || echo "purge failed: $path"
           done
