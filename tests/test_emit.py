@@ -27,8 +27,8 @@ def test_render_list_order_and_dedupe():
 
 def test_render_filter_remote():
     lines = render_filter_remote(["apns", "china"], {"china"}, "https://cdn.example/q@release").splitlines()
-    assert lines[0].startswith("https://cdn.example/q@release/apns.list, tag=quanlight-apns, force-policy=<proxy-policy>,")
-    assert lines[1].startswith("https://cdn.example/q@release/china.list, tag=quanlight-china, force-policy=direct,")
+    assert lines[0].startswith("https://cdn.example/q@release/apns.list, tag=apns, force-policy=hello world ：）,")
+    assert lines[1].startswith("https://cdn.example/q@release/china.list, tag=china, force-policy=direct,")
     assert all("update-interval=-1," in l for l in lines[:2])
     assert lines[-1].startswith("FILTER_LAN,")
 
@@ -46,4 +46,4 @@ def test_render_release_readme_has_both_snippets():
     assert "https://raw.githubusercontent.com/owner/quanlight/release/china.list" in text
     assert "https://ghfast.top/https://raw.githubusercontent.com/owner/quanlight/release/apns.list" in text
     assert text.count("[filter_remote]") == 2
-    assert text.count("final, <proxy-policy>") == 2
+    assert text.count("final, hello world ：）") == 2

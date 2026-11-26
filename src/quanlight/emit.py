@@ -5,7 +5,8 @@ from collections.abc import Collection, Sequence
 
 from .model import RULE_TYPES, Rule
 
-PROXY_POLICY_PLACEHOLDER = "<proxy-policy>"
+# 本人配置里代理托底策略的名称；他人使用时改成自己的策略名
+PROXY_POLICY = "hello world ：）"
 # 规则集只在本人手动更新时拉取，-1 关闭自动同步（D-023）
 _REMOTE_OPTS = "update-interval=-1, opt-parser=false, enabled=true"
 
@@ -23,8 +24,8 @@ def render_filter_remote(names: Sequence[str], direct: Collection[str], base_url
     base = base_url.rstrip("/")
     lines = []
     for name in names:
-        policy = "direct" if name in direct else PROXY_POLICY_PLACEHOLDER
-        lines.append(f"{base}/{name}.list, tag=quanlight-{name}, force-policy={policy}, {_REMOTE_OPTS}")
+        policy = "direct" if name in direct else PROXY_POLICY
+        lines.append(f"{base}/{name}.list, tag={name}, force-policy={policy}, {_REMOTE_OPTS}")
     lines.append("FILTER_LAN, tag=LAN, force-policy=direct, enabled=true")
     return "\n".join(lines) + "\n"
 
@@ -172,7 +173,7 @@ def render_release_readme(names: Sequence[str], direct: Collection[str], owner: 
             "",
             "[filter_local]",
             "# personal exceptions go here",
-            f"final, {PROXY_POLICY_PLACEHOLDER}",
+            f"final, {PROXY_POLICY}",
             "```",
         ]
 
@@ -182,7 +183,7 @@ def render_release_readme(names: Sequence[str], direct: Collection[str], owner: 
         f"Built from https://github.com/{owner}/{repo}. Mainland China domains and networks connect directly;",
         "everything else falls through to `final` and goes through your proxy.",
         "",
-        f"Replace `{PROXY_POLICY_PLACEHOLDER}` with your own policy name. Every line needs its `force-policy`;",
+        f"`{PROXY_POLICY}` is the proxy policy in the author's profile; replace it with yours. Every line needs its `force-policy`;",
         "without it the rules point at a policy that does not exist.",
         "",
         "## Base URLs",

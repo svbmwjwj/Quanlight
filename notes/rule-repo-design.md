@@ -176,17 +176,17 @@ APNs 单独成包，排在直连列表之前，强制走代理（用户，D-008�
 
 ## 订阅与产物
 
-产物为 `apns.list` 与 `china.list`，两类设备共用；README 生成可直接粘贴的 `[filter_remote]` 片段，每行带 `force-policy`（Claude）：
+产物为 `apns.list` 与 `china.list`，两类设备共用；README 生成可直接粘贴的 `[filter_remote]` 片段，每行带 `force-policy`（Claude）；`tag` 直接用包名，不加 `quanlight-` 前缀，代理策略名沿用本人配置中的 `hello world ：）`（用户）：
 
 ```
 [filter_remote]
-<base>/apns.list, tag=quanlight-apns, force-policy=<代理策略>, update-interval=-1, enabled=true
-<base>/china.list, tag=quanlight-china, force-policy=direct, update-interval=-1, enabled=true
+<base>/apns.list, tag=apns, force-policy=hello world ：）, update-interval=-1, enabled=true
+<base>/china.list, tag=china, force-policy=direct, update-interval=-1, enabled=true
 FILTER_LAN, tag=LAN, force-policy=direct, enabled=true
 
 [filter_local]
 <个人例外>
-final, <代理策略>
+final, hello world ：）
 ```
 
 列表第三列写包名，订阅时被 `force-policy` 覆盖；未设置 `force-policy` 时规则会指向不存在的策略，README 中明确提示（Claude）。

@@ -40,18 +40,18 @@ jsDelivr when they work for you.
 
 ```
 [filter_remote]
-https://raw.githubusercontent.com/svbmwjwj/quanlight/release/apns.list, tag=quanlight-apns, force-policy=<proxy-policy>, update-interval=-1, opt-parser=false, enabled=true
-https://raw.githubusercontent.com/svbmwjwj/quanlight/release/china.list, tag=quanlight-china, force-policy=direct, update-interval=-1, opt-parser=false, enabled=true
+https://raw.githubusercontent.com/svbmwjwj/quanlight/release/apns.list, tag=apns, force-policy=hello world ：）, update-interval=-1, opt-parser=false, enabled=true
+https://raw.githubusercontent.com/svbmwjwj/quanlight/release/china.list, tag=china, force-policy=direct, update-interval=-1, opt-parser=false, enabled=true
 FILTER_LAN, tag=LAN, force-policy=direct, enabled=true
 
 [filter_local]
 # personal exceptions go here
-final, <proxy-policy>
+final, hello world ：）
 ```
 
 Keep `apns.list` above `china.list`. Every line needs its `force-policy`:
-replace `<proxy-policy>` with your own policy name, otherwise the rules point
-at a policy that does not exist. `update-interval=-1` turns off automatic
+`hello world ：）` is the proxy policy in the author's profile; replace it with yours,
+otherwise the rules point at a policy that does not exist. `update-interval=-1` turns off automatic
 syncing; update the lists by hand after a release. The release branch's
 `README.md` has the same snippet for GitHub and the mainland mirror.
 
