@@ -31,3 +31,35 @@ expect = "direct"
 [[sample]]
 host = "api.bilibili.com"
 expect = "direct"
+
+[[sample]]
+host = "x.com"
+expect = "twitter"
+
+[[sample]]
+host = "pbs.twimg.com"
+expect = "twitter"
+
+[[sample]]
+host = "github.com"
+expect = "github"
+
+[[sample]]
+host = "objects.githubusercontent.com"
+expect = "github"
+
+[[sample]]
+host = "www.linkedin.com"
+expect = "linkedin"
+
+[[sample]]
+host = "www.youtube.com"
+expect = "youtube"
+
+[[sample]]
+host = "i.ytimg.com"
+expect = "youtube"
+
+[[sample]]
+host = "www.bilibili.com"
+expect = "direct"

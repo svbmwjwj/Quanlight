@@ -1,0 +1,136 @@
+name = "twitter"
+description = "Twitter / X"
+order = 50
+v2fly_ignore = ["twitter.map.fastly.net"]
+
+[[rule]]
+type = "host-suffix"
+value = "cms-twdigitalassets.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "periscope.tv"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "pscp.tv"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "t.co"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "tellapart.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "tweetdeck.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twimg.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitpic.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitter.biz"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitter.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitter.jp"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twittercommunity.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitterflightschool.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitterinc.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitteroauth.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twitterstat.us"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twtrdns.net"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twttr.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twttr.net"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "twvid.com"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "vine.co"
+role = "core"
+source = "v2fly:twitter"
+
+[[rule]]
+type = "host-suffix"
+value = "x.com"
+role = "core"
+source = "v2fly:twitter"
