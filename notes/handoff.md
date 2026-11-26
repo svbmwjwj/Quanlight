@@ -102,3 +102,10 @@ updated: 2026-11-26
 - 待办 3 已开子对话 `device-observation`，本人在场；它负责 claude、apns、telegram、twitter、github、linkedin、crypto 清单，google 相关发现只写进报告。另请它验证 Telegram 等应用的通知在 APNs 走代理时能到达（本人指出 APNs 必须走代理）。
 - macOS 第 3 阶段：本人决定暂不做。
 - 首次人工发布：等真机观测通过后，在 Actions 页面手动运行 `build` 并勾选 `publish`。
+
+### 暂停（同日）
+
+- 本人出门，真机观测暂停。子对话 `device-observation` 的交接笔记在共享笔记目录 `device-observation-handover.md`；分支 `claude/device-observation-db6446` 有 D-025（`1767b1f`），尚未合并。
+- D-025：“分流匹配优化”开启时类型顺序为 `host` > `host-suffix` > `host-wildcard` > `host-keyword`，与 `match.py` 的暂定顺序一致；关闭时主机规则按加载顺序匹配。
+- 已观测：Claude 应用（`claude.ai`、Sift、Datadog、Sentry 走 `ai`，`fcmtoken.googleapis.com` 命中 google）。未观测：claude.ai 网页记录、其余应用、Telegram 推送。
+- WDA 运行器已停止；回来后按 `~/tools/wda/README.md` 重新启动。
