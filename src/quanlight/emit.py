@@ -6,7 +6,8 @@ from collections.abc import Mapping, Sequence
 from .model import RULE_TYPES, Bundle, Rule
 
 PROXY_POLICY_PLACEHOLDER = "<proxy-policy>"
-_REMOTE_OPTS = "update-interval=86400, opt-parser=false, enabled=true"
+# 规则集只在本人手动更新时拉取，-1 关闭自动同步（D-023）
+_REMOTE_OPTS = "update-interval=-1, opt-parser=false, enabled=true"
 
 
 def render_list(name: str, rules: Sequence[Rule], provenance: Mapping[str, str]) -> str:
