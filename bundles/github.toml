@@ -400,3 +400,6 @@ type = "host-suffix"
 value = "collector.github.com"
 role = "core"
 source = "v2fly:github"
+
+[[upstream]]
+kind = "github-meta"
