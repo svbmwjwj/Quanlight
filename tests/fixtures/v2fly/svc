@@ -1,0 +1,12 @@
+# sample service
+svc.com
+domain:alt-svc.com
+full:api.svc-cdn.net
+keyword:svckw
+regexp:^x\.svc\.com$
+ads.svc.com @ads
+cn.svc.com @cn
+full:dl.svc.com @cn  # inline comment
+tracked.svc.com &svc-affiliate
+include:svc-sub
+include:youtube
