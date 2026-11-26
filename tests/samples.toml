@@ -82,7 +82,7 @@ expect = "direct"
 
 [[sample]]
 host = "c.android.clients.google.com"
-expect = "direct"
+expect = "google"
 
 [[sample]]
 host = "claude.ai"
@@ -147,3 +147,23 @@ expect = "ipfs"
 [[sample]]
 host = "www.binance.com"
 expect = "direct"
+
+[[sample]]
+host = "www.gstatic.com"
+expect = "google"
+
+[[sample]]
+host = "ssl.gstatic.com"
+expect = "google"
+
+[[sample]]
+host = "dl.google.com"
+expect = "direct"
+
+[[sample]]
+host = "phantom.com"
+expect = "phantom"
+
+[[sample]]
+host = "relay.walletconnect.com"
+expect = "shared-walletconnect"

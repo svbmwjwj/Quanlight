@@ -45,438 +45,657 @@ type = "host-suffix"
 value = "blogspot.ae"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.al"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.am"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ba"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.be"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.bg"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.bj"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ca"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.cf"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ch"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.cl"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.at"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.id"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.il"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.ke"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.nz"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.uk"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.co.za"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.ar"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.au"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.br"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.by"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.co"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.cy"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.ee"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.eg"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.es"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.mt"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.ng"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.tr"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.com.uy"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.cv"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.cz"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.de"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.dk"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.fi"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.fr"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.gr"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.hk"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.hr"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.hu"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ie"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.in"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.is"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.it"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.jp"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.kr"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.li"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.lt"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.lu"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.md"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.mk"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.mx"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.my"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.nl"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.no"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.pe"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.pt"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.qa"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.re"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ro"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.rs"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ru"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.se"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.sg"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.si"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.sk"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.sn"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.td"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.tw"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.ug"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "blogspot.vn"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -543,12 +762,18 @@ type = "host-suffix"
 value = "firebaseapp.com"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "firebaseio.com"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -559,14 +784,16 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "crashlyticsreports-pa.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "firebase-settings.crashlytics.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -649,8 +876,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "update.crashlytics.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host-suffix"
@@ -3105,6 +3333,9 @@ type = "host-suffix"
 value = "appspot.com"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -3291,12 +3522,18 @@ type = "host-suffix"
 value = "cloudfunctions.net"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
 value = "cloudproxy.app"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -3495,6 +3732,9 @@ type = "host-suffix"
 value = "gateway.dev"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -3813,6 +4053,9 @@ type = "host-suffix"
 value = "googleusercontent.com"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -4167,6 +4410,9 @@ type = "host-suffix"
 value = "page.link"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -4305,6 +4551,9 @@ type = "host-suffix"
 value = "run.app"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -4557,6 +4806,9 @@ type = "host-suffix"
 value = "web.app"
 role = "core"
 source = "v2fly:google"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"
@@ -4771,8 +5023,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "adservice.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4807,26 +5060,30 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "beacons.gcp.gvt2.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "beacons.gvt2.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "beacons2.gvt2.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "beacons3.gvt2.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4837,26 +5094,30 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "c.android.clients.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "cache-management-prod.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "cache.pack.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "checkin.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4867,8 +5128,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "clickserve.dartsearch.net"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4879,8 +5141,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "clientservices.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4897,8 +5160,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "csi.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4909,8 +5173,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "dg-meta.video.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4933,14 +5198,16 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "download.mlcc.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "download.tensorflow.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -4963,32 +5230,37 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "g0.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "g1.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "g2.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "g3.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "gonglchuangl.net"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -5125,32 +5397,37 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "imasdk.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "performanceparameters.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "prod-controlbe.floonet.goog"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "prod-databe.floonet.goog"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "prod.databe.floonet.goog"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -5227,14 +5504,16 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "safebrowsing-cache.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "safebrowsing.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -5245,50 +5524,58 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "ssl.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "staging-controlbe.floonet.goog"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "staging-databe.floonet.goog"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "staging.databe.floonet.goog"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "tac.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "tools.google.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "update.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
 value = "wear.googleapis.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"
@@ -5299,8 +5586,9 @@ source = "v2fly:google"
 [[rule]]
 type = "host"
 value = "www.gstatic.com"
-role = "cn-exception"
+role = "core"
 source = "v2fly:google"
+reason = "google.china.conf node marked unstable upstream; routed with the rest of Google"
 
 [[rule]]
 type = "host"

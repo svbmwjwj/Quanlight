@@ -139,6 +139,9 @@ type = "host-suffix"
 value = "github.io"
 role = "core"
 source = "v2fly:github"
+reason = "multi-tenant hosting owned by the platform; third-party apps hosted here are also proxied"
+breadth = "broad"
+review_by = 2027-02-28
 
 [[rule]]
 type = "host-suffix"

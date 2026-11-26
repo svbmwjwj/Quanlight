@@ -1,0 +1,15 @@
+name = "shared-walletconnect"
+description = "WalletConnect relay used by wallets and dApps to connect"
+order = 29
+
+[[rule]]
+type = "host"
+value = "relay.walletconnect.com"
+role = "dependency"
+source = "v2fly:category-cryptocurrency"
+
+[[rule]]
+type = "host"
+value = "relay.walletconnect.org"
+role = "dependency"
+source = "v2fly:category-cryptocurrency"
