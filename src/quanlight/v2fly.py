@@ -69,6 +69,24 @@ def expand(data_dir: Path, name: str, exclude: Iterable[str] = ()) -> list[Entry
     return walk(name, ())
 
 
+def includes(data_dir: Path, name: str) -> set[str]:
+    """name 直接或间接 include 的全部文件名。"""
+    found: set[str] = set()
+    pending = [name]
+    while pending:
+        path = data_dir / pending.pop()
+        if not path.is_file():
+            continue
+        for raw in path.read_text(encoding="utf-8").splitlines():
+            parsed = _parse_line(raw)
+            if parsed and parsed[0].startswith("include:"):
+                target = parsed[0].removeprefix("include:")
+                if target not in found:
+                    found.add(target)
+                    pending.append(target)
+    return found
+
+
 # v2fly 公司文件的导入映射（设计文档“直连数据”）：
 # 无前缀或 domain: -> host-suffix，full: -> host；@!cn、@ads 与 keyword: 不导入，regexp: 计数丢弃。
 def import_direct(entries: Iterable[Entry], source: str) -> ImportResult:

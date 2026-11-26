@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from quanlight.v2fly import V2flyError, expand, foreign_domains, import_direct
+from quanlight.v2fly import V2flyError, expand, foreign_domains, import_direct, includes
 
 DATA = Path(__file__).parent / "fixtures" / "v2fly"
 
@@ -79,3 +79,21 @@ def test_import_direct_rejects_unknown_kind(tmp_path):
 def test_foreign_domains_drop_cn_and_patterns():
     domains = foreign_domains(expand(DATA, "geolocation-!cn"))
     assert domains == ["google.com", "www.google.cn", "t.me", "example.cn"]
+
+
+def test_includes_lists_nested_files():
+    assert includes(DATA, "nest-top") == {"mid", "leaf"}
+    assert includes(DATA, "svc") == {"svc-sub", "youtube"}
+    assert includes(DATA, "leaf") == set()
+
+
+def test_sync_upstream_skips_includes():
+    from quanlight.cli import _sync_upstream
+    from quanlight.model import UpstreamSpec
+
+    spec = UpstreamSpec("v2fly", "svc", "Svc", ("youtube",))
+    data = _sync_upstream([spec], DATA, "v1")["v2fly:svc"]
+    values = {r.value for r in data.rules}
+    assert "sub.com" in values and "youtube.com" not in values
+    with pytest.raises(V2flyError, match="typo"):
+        _sync_upstream([UpstreamSpec("v2fly", "svc", "Svc", ("typo",))], DATA, "v1")

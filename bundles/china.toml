@@ -3,11 +3,13 @@ description = "Mainland China domains and IP ranges for everyday apps, connected
 order = 20
 
 # 按本人常用场景整理（D-029）：每个常用应用取 v2fly 对应的公司文件，每次构建从上游同步。
+# 国际站与海外业务不直连：只服务境外的 include 子文件写进 skip_includes。
 
 [[upstream]]
 kind = "v2fly"
 file = "tencent"
 apps = "WeChat, QQ"
+skip_includes = ["webnovel"]
 
 [[upstream]]
 kind = "v2fly"
@@ -18,6 +20,7 @@ apps = "Xiaohongshu"
 kind = "v2fly"
 file = "alibaba"
 apps = "Alipay, Taobao"
+skip_includes = ["alibabacloud"]
 
 [[upstream]]
 kind = "v2fly"
@@ -75,3 +78,21 @@ reason = "mainland country-code TLD; covers 12306.cn and other .cn sites (D-029)
 [[keep]]
 value = "cn"
 reason = "mainland country-code TLD; overseas companies' .cn sites are reachable directly"
+
+# 腾讯云在 v2fly 里以整个域名收录，境外区域只是带 @!cn 的子域，跳过子域并不能让它们离开直连。
+# 剔除这些父域名后，国内区域解析到大陆网段仍直连，境外区域落到 final。
+[[exclude]]
+value = "myqcloud.com"
+reason = "parent of overseas Tencent Cloud regions; mainland regions fall back to China IP ranges"
+
+[[exclude]]
+value = "tencentcos.cn"
+reason = "parent of overseas Tencent Cloud regions; mainland regions fall back to China IP ranges"
+
+[[exclude]]
+value = "tencentcos.com"
+reason = "parent of overseas Tencent Cloud regions; mainland regions fall back to China IP ranges"
+
+[[exclude]]
+value = "tencentcos.com.cn"
+reason = "parent of overseas Tencent Cloud regions; mainland regions fall back to China IP ranges"

@@ -19,7 +19,7 @@ _MANUAL_SOURCES = ("observed", "manual")
 _BUNDLE_KEYS = {"name", "description", "order", "rule", "upstream", "exclude", "keep"}
 _RULE_KEYS = {"type", "value", "source", "reason"}
 _NOTE_KEYS = {"value", "reason"}
-_UPSTREAM_KEYS = {"kind", "file", "apps"}
+_UPSTREAM_KEYS = {"kind", "file", "apps", "skip_includes"}
 
 
 class ManifestError(Exception):
@@ -54,7 +54,12 @@ def _note_from_table(table: dict, where: str) -> Note:
 
 def _upstream_from_table(table: dict, where: str) -> UpstreamSpec:
     _check_keys(table, _UPSTREAM_KEYS, where)
-    return UpstreamSpec(kind=table.get("kind", ""), file=table.get("file"), apps=table.get("apps"))
+    return UpstreamSpec(
+        kind=table.get("kind", ""),
+        file=table.get("file"),
+        apps=table.get("apps"),
+        skip_includes=tuple(table.get("skip_includes", ())),
+    )
 
 
 def load_bundle(path: Path) -> Bundle:
@@ -118,8 +123,8 @@ def validate_bundle(bundle: Bundle) -> list[str]:
             errors.append(f"{bundle.name}: unknown upstream kind {spec.kind!r}")
         elif spec.kind == "v2fly" and not (spec.file and spec.apps):
             errors.append(f"{bundle.name}: v2fly upstream needs file and apps")
-        elif spec.kind != "v2fly" and spec.file is not None:
-            errors.append(f"{bundle.name}: {spec.kind} upstream takes no file")
+        elif spec.kind != "v2fly" and (spec.file is not None or spec.skip_includes):
+            errors.append(f"{bundle.name}: {spec.kind} upstream takes no file or skip_includes")
     for rule in bundle.rules:
         where = f"{bundle.name}: {rule.type}, {rule.value}"
         if rule.type not in RULE_TYPES:

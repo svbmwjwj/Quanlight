@@ -126,6 +126,7 @@ reason = "..."
 - `[[exclude]]`：按值精确剔除上游条目，须写 `reason`。
 - `[[keep]]`：反向检查的豁免，须写 `reason`。
 - `[[upstream]]`：`kind = "v2fly"` 时 `file` 与 `apps` 必填，`apps` 写这个文件服务于哪些常用应用。
+- `skip_includes`：`kind = "v2fly"` 时可选，列出展开时跳过的 include 子文件，用于剔除只服务境外的国际站与海外业务；所列文件须确实被引用（用户：不要国际站；字段 Claude）。
 - 包级 `order` 决定订阅顺序。
 
 ## 直连数据

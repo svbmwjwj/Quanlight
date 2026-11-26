@@ -25,7 +25,7 @@ from .sources import (
     parse_google_ipranges,
     parse_telegram_cidr,
 )
-from .v2fly import V2flyError, expand, foreign_domains, import_direct
+from .v2fly import V2flyError, expand, foreign_domains, import_direct, includes
 
 DEFAULT_OWNER = "svbmwjwj"
 DEFAULT_REPO = "quanlight"
@@ -51,7 +51,11 @@ def _sync_upstream(specs: list[UpstreamSpec], v2fly_dir: Path, v2fly_version: st
         if spec.key in out:
             continue
         if spec.kind == "v2fly" and spec.file:
-            result = import_direct(expand(v2fly_dir, spec.file), source=f"v2fly:{spec.file}")
+            # 跳过的子文件必须确实被引用，避免拼错后悄悄失效
+            if missing := sorted(set(spec.skip_includes) - includes(v2fly_dir, spec.file)):
+                raise V2flyError(f"{spec.file}: skip_includes not included: {missing}")
+            entries = expand(v2fly_dir, spec.file, exclude=spec.skip_includes)
+            result = import_direct(entries, source=f"v2fly:{spec.file}")
             skipped: dict[str, list[str]] = {}
             for entry, reason in result.skipped:
                 skipped.setdefault(reason, []).append(entry.value)

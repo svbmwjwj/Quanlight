@@ -25,7 +25,7 @@ def rule(type_: str, value: str, source: str = "manual", reason: str | None = "r
 def test_load_full_manifest(tmp_path):
     path = write(
         tmp_path,
-        HEAD + '[[upstream]]\nkind = "v2fly"\nfile = "tencent"\napps = "WeChat, QQ"\n'
+        HEAD + '[[upstream]]\nkind = "v2fly"\nfile = "tencent"\napps = "WeChat, QQ"\nskip_includes = ["webnovel"]\n'
         '[[upstream]]\nkind = "dnsmasq-apple-china"\n'
         '[[rule]]\ntype = "host-suffix"\nvalue = "Example.CN."\nsource = "manual"\nreason = "r"\n'
         '[[exclude]]\nvalue = "Blocked.com"\nreason = "overseas"\n'
@@ -33,7 +33,7 @@ def test_load_full_manifest(tmp_path):
     )
     bundle = load_bundle(path)
     assert bundle.rules == (Rule("host-suffix", "example.cn", "manual", "r"),)
-    assert bundle.upstream == (UpstreamSpec("v2fly", "tencent", "WeChat, QQ"), UpstreamSpec("dnsmasq-apple-china"))
+    assert bundle.upstream == (UpstreamSpec("v2fly", "tencent", "WeChat, QQ", ("webnovel",)), UpstreamSpec("dnsmasq-apple-china"))
     assert [u.key for u in bundle.upstream] == ["v2fly:tencent", "dnsmasq-apple-china"]
     assert bundle.exclude == (Note("blocked.com", "overseas"),)
     assert bundle.keep == (Note("1.0.1.0/24", "mainland"),)
@@ -65,6 +65,7 @@ def test_validate_upstream_fields():
 
     assert any("file and apps" in e for e in errs(UpstreamSpec("v2fly", "tencent")))
     assert any("takes no file" in e for e in errs(UpstreamSpec("china-operator-ip", "x")))
+    assert any("takes no file" in e for e in errs(UpstreamSpec("china-operator-ip", skip_includes=("x",))))
     assert any("duplicate" in e for e in errs(UpstreamSpec("v2fly", "jd", "JD"), UpstreamSpec("v2fly", "jd", "JD")))
     assert errs(UpstreamSpec("v2fly", "jd", "JD"), UpstreamSpec("china-operator-ip")) == []
 

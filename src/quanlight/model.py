@@ -30,6 +30,7 @@ class UpstreamSpec:
     kind: str
     file: str | None = None
     apps: str | None = None
+    skip_includes: tuple[str, ...] = ()  # 展开时跳过的 include 子文件
 
     @property
     def key(self) -> str:
