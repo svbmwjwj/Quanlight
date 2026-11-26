@@ -35,7 +35,7 @@ def test_probe_command_writes_all_files(tmp_path):
     assert main(["probe", "--out", str(tmp_path), "--base-url", "https://x"]) == 0
     assert (tmp_path / "probe-order.conf").is_file()
     assert "https://x/probe/probe-type-1.list" in (tmp_path / "probe-type.conf").read_text()
-    assert len(list(tmp_path.glob("*.list"))) == 7
+    assert len(list(tmp_path.glob("*.list"))) == 14
 
 
 def test_probe_profile_serves_lists_from_local_backend():
@@ -64,3 +64,13 @@ def test_probe_profile_can_reference_script_by_url():
 
     profile = render_probe_profile("https://x/probe/quanlight-probe.js")["quanlight-probe.conf"]
     assert "https://x/probe/quanlight-probe.js, tag=quanlight-probe, path=^/quanlight-probe/" in profile
+
+
+def test_probe_profile_remote_mode_lists_files_without_backend():
+    from quanlight.emit import render_probe_profile
+
+    files = render_probe_profile(remote_base="https://m/probe")
+    profile = files["quanlight-probe.conf"]
+    assert "https://m/probe/order-1.list, tag=order-1, force-policy=reject" in profile
+    assert "127.0.0.1" not in profile and "quanlight-probe.js" not in profile
+    assert files["order-1.list"] == "host-suffix, example.com, order-1\n"

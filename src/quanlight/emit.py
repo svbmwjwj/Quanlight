@@ -80,8 +80,12 @@ def render_probe(case: str, base_url: str) -> dict[str, str]:
     return files
 
 
-def render_probe_profile(script_ref: str = "quanlight-probe.js") -> dict[str, str]:
-    """生成可单独切换使用的探针配置，以及在本机 http_backend 上提供探针列表的脚本。"""
+def render_probe_profile(script_ref: str = "quanlight-probe.js", remote_base: str | None = None) -> dict[str, str]:
+    """生成可单独切换使用的探针配置。
+
+    remote_base 为空时，探针列表由本机 http_backend 脚本提供；Quantumult X 拉取规则资源不经过自身隧道，
+    访问不到 127.0.0.1:9999，所以真机探针应传入 remote_base，从远程地址下载列表文件。
+    """
     lists: dict[str, str] = {}
     remote: list[str] = []
     local: list[str] = []
@@ -90,9 +94,8 @@ def render_probe_profile(script_ref: str = "quanlight-probe.js") -> dict[str, st
         for i, (type_, value, policy) in enumerate(rules, start=1):
             name = f"{case}-{i}"
             lists[f"{name}.list"] = f"{type_}, {value}, {name}\n"
-            remote.append(
-                f"http://127.0.0.1:{PROBE_PORT}/{PROBE_PATH}/{name}.list, tag={name}, force-policy={policy}, enabled=true"
-            )
+            base = remote_base.rstrip("/") if remote_base else f"http://127.0.0.1:{PROBE_PORT}/{PROBE_PATH}"
+            remote.append(f"{base}/{name}.list, tag={name}, force-policy={policy}, enabled=true")
         if local_rule:
             local.append(local_rule)
     profile = "\n".join(
@@ -127,7 +130,7 @@ def render_probe_profile(script_ref: str = "quanlight-probe.js") -> dict[str, st
             "[task_local]",
             "",
             "[http_backend]",
-            f"{script_ref}, tag=quanlight-probe, path=^/{PROBE_PATH}/, enabled=true",
+            *([] if remote_base else [f"{script_ref}, tag=quanlight-probe, path=^/{PROBE_PATH}/, enabled=true"]),
             "",
             "[mitm]",
         ]
@@ -142,6 +145,8 @@ def render_probe_profile(script_ref: str = "quanlight-probe.js") -> dict[str, st
         "  ? { status: \"HTTP/1.1 404 Not Found\", headers: { Connection: \"Close\" }, body: \"not found\\n\" }\n"
         "  : { status: \"HTTP/1.1 200 OK\", headers: { \"Content-Type\": \"text/plain\", Connection: \"Close\" }, body: body });\n"
     )
+    if remote_base:
+        return {"quanlight-probe.conf": profile, **lists}
     return {"quanlight-probe.conf": profile, "quanlight-probe.js": script}
 
 
