@@ -34,6 +34,15 @@ snippet in the correct order. Every line needs a `force-policy`: replace
 `<proxy-policy>` with your own policy name, otherwise the rules point at a
 policy that does not exist. End `[filter_local]` with `final, direct`.
 
+## Templates
+
+`templates/` holds ready-to-adapt profiles with every private value replaced by
+a `<...>` placeholder:
+
+- `templates/ios.conf`: blacklist mode on quanlight lists.
+- `templates/macos.conf`: whitelist mode; uses third-party direct lists until
+  quanlight's macOS lists exist.
+
 ## Build locally
 
 ```
