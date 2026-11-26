@@ -39,6 +39,7 @@ def test_render_filter_remote():
     assert "force-policy=direct" in lines[0]
     assert "/ios/apns.list," in lines[1] and "/ios/telegram.list," in lines[2]
     assert all("force-policy=<proxy-policy>" in l for l in lines[1:3])
+    assert all("update-interval=-1," in l for l in lines[:3])
     assert lines[-1].startswith("FILTER_LAN,")
 
 

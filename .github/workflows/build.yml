@@ -1,21 +1,28 @@
 name: build
 
+# 定时与推送 main 时只试构建并报告与 release 分支的差异，不发布（D-020）。
+# 发布：在 Actions 页面手动运行本工作流并勾选 publish。
 on:
   schedule:
     - cron: "0 18 * * *" # 北京时间 02:00
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the built lists to the release branch"
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: build
   cancel-in-progress: false
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     env:
       BASE_URL: https://raw.githubusercontent.com/${{ github.repository_owner }}/quanlight/release
@@ -29,23 +36,74 @@ jobs:
         run: uv run quanlight build --out dist --owner "${{ github.repository_owner }}" --repo quanlight
       - name: Probe lists
         run: uv run quanlight probe --out dist/probe --base-url "https://ghfast.top/$BASE_URL"
+      - name: Report changes against release branch
+        run: |
+          set -uo pipefail
+          {
+            echo "## Changes against release"
+            echo
+            if ! git fetch -q --depth 1 origin release:refs/remotes/origin/release; then
+              echo "Could not read the release branch; no comparison."
+              exit 0
+            fi
+            mkdir -p "$RUNNER_TEMP/release"
+            git archive refs/remotes/origin/release | tar -x -C "$RUNNER_TEMP/release"
+            if git diff --no-index --quiet "$RUNNER_TEMP/release" dist; then
+              echo "No content change; nothing to publish."
+              exit 0
+            fi
+            echo '```'
+            git diff --no-index --stat=200 "$RUNNER_TEMP/release" dist
+            echo '```'
+            echo
+            echo "<details><summary>Changed lines</summary>"
+            echo
+            echo '```diff'
+            git diff --no-index --unified=0 "$RUNNER_TEMP/release" dist | head -n 3000
+            echo '```'
+            echo
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          include-hidden-files: true
+          retention-days: 7
+
+  publish:
+    needs: check
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - name: Publish to release branch
         run: |
           set -euo pipefail
-          git fetch --depth 1 origin release:refs/remotes/origin/release || true
-          old_tree=$(git rev-parse -q --verify 'refs/remotes/origin/release^{tree}' || echo none)
+          # 读取 release 失败时直接失败，不在不知旧内容的情况下强推
+          git fetch --depth 1 origin release:refs/remotes/origin/release
+          old_tree=$(git rev-parse 'refs/remotes/origin/release^{tree}')
           cd dist
           git init -q -b release
           git add -A
           new_tree=$(git write-tree)
           if [ "$old_tree" = "$new_tree" ]; then
-            echo "No content change; release branch left as is."
+            echo "No content change; release branch left as is." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
               commit -q -m "release: lists from ${GITHUB_SHA::7}"
           git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" release
+          echo "Published lists from ${GITHUB_SHA::7} to release." >> "$GITHUB_STEP_SUMMARY"
           git ls-files | while read -r path; do
             curl -fsS -o /dev/null "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY_OWNER}/quanlight@release/${path}" || echo "purge failed: $path"
           done
