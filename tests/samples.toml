@@ -83,3 +83,31 @@ expect = "direct"
 [[sample]]
 host = "c.android.clients.google.com"
 expect = "direct"
+
+[[sample]]
+host = "claude.ai"
+expect = "claude"
+
+[[sample]]
+host = "api.anthropic.com"
+expect = "claude"
+
+[[sample]]
+host = "maps.googleapis.com"
+expect = "claude"
+
+[[sample]]
+host = "o1158394.ingest.us.sentry.io"
+expect = "claude"
+
+[[sample]]
+ip = "160.79.104.10"
+expect = "claude"
+
+[[sample]]
+host = "oauth2.googleapis.com"
+expect = "google"
+
+[[sample]]
+host = "fonts.googleapis.com"
+expect = "direct"
