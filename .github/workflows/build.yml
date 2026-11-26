@@ -61,13 +61,14 @@ jobs:
               exit 0
             fi
             echo '```'
-            git diff --no-index --stat=200 "$RUNNER_TEMP/release" dist
+            # 有差异时 git diff --no-index 以 1 退出，不能让它中断摘要步骤
+            git diff --no-index --stat=200 "$RUNNER_TEMP/release" dist || true
             echo '```'
             echo
             echo "<details><summary>Changed lines</summary>"
             echo
             echo '```diff'
-            git diff --no-index --unified=0 "$RUNNER_TEMP/release" dist | head -n 3000
+            { git diff --no-index --unified=0 "$RUNNER_TEMP/release" dist || true; } | head -n 3000 || true
             echo '```'
             echo
             echo "</details>"
