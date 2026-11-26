@@ -15,7 +15,7 @@ from pathlib import Path
 
 from . import fetch
 from .check import build_ios_lists, cross_check, direct_exceptions, find_misfires
-from .emit import render_filter_remote, render_list
+from .emit import PROBE_CASES, render_filter_remote, render_list, render_probe
 from .manifest import dump_bundle, load_bundles, validate_bundle
 from .match import IPNetwork, route
 from .model import Bundle, Rule
@@ -207,6 +207,14 @@ def _cmd_import(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_probe(args: argparse.Namespace) -> int:
+    args.out.mkdir(parents=True, exist_ok=True)
+    for case in PROBE_CASES:
+        for name, text in render_probe(case, args.base_url.rstrip("/") + "/probe").items():
+            (args.out / name).write_text(text, encoding="utf-8")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="quanlight")
     parser.add_argument("--cache", type=Path, default=Path(".cache"))
@@ -226,6 +234,11 @@ def main(argv: list[str] | None = None) -> int:
     p_import.add_argument("--exclude", action="append", default=[])
     p_import.add_argument("--v2fly-data", type=Path)
     p_import.set_defaults(func=_cmd_import)
+
+    p_probe = sub.add_parser("probe", help="write rule-matching probe lists")
+    p_probe.add_argument("--out", type=Path, default=Path("dist/probe"))
+    p_probe.add_argument("--base-url", default=DEFAULT_BASE_URL)
+    p_probe.set_defaults(func=_cmd_probe)
 
     args = parser.parse_args(argv)
     return args.func(args)
