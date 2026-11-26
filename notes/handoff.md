@@ -109,3 +109,33 @@ updated: 2026-11-26
 - D-025：“分流匹配优化”开启时类型顺序为 `host` > `host-suffix` > `host-wildcard` > `host-keyword`，与 `match.py` 的暂定顺序一致；关闭时主机规则按加载顺序匹配。
 - 已观测：Claude 应用（`claude.ai`、Sift、Datadog、Sentry 走 `ai`，`fcmtoken.googleapis.com` 命中 google）。未观测：claude.ai 网页记录、其余应用、Telegram 推送。
 - WDA 运行器已停止；回来后按 `~/tools/wda/README.md` 重新启动。
+
+## 2026-11-26（新对话入口）
+
+前面各节是过程记录；新对话从本节读起，需要细节时再回看。
+
+### 当前状态
+
+- `main`：工作区干净，本地提交均未推送到 `origin/main`；`release` 分支仍是第一次自动发布的旧产物。
+- 已合并：匹配模型（类型优先）、人工发布（D-023）、官方 IP 数据（D-022）、YouTube 并入 google（D-024）、包顺序检查改用模拟器。
+- 未合并：分支 `claude/device-observation-db6446` 的 `1767b1f`，只含 D-025 决策文件；清单未改。合并后还要在设计文档“构建与检查”一节补 D-025 标注。
+- 残留 worktree：`.claude/worktrees/` 下四个，其中三个子对话分支已合并，可在本人同意后清理。
+- 旧会话：协调会话 `quanlight-next` 与子对话 `device-observation` 均已停下，不再使用。
+
+### 真机观测的恢复资料
+
+- 详细交接在私密笔记 `~/.config/quanlight/notes/device-observation-handover.md`（含局域网地址，不进仓库）。
+- 要点：Claude 应用已观测；claude.ai 网页记录已采集未读出；Telegram、X、GitHub、LinkedIn、Google、加密货币应用与 APNs 通知未做。
+- 暂定收窄：`siftscience.com` 可改为 `host, api3.siftscience.com`；其余 broad 条目待网页记录。
+- 手机：暂停时用的是 `ios-lan-probe.conf`（带 4 个探针列表与局域网列表源），本人出门前应已切回 `ios-phone_bak_20261126.conf`；恢复观测时先确认手机当前配置。
+
+### 待本人决定
+
+- 是否合并 D-025 分支、是否推送 `main`。
+- 真机观测何时继续（需本人在场）。
+- 观测通过后首次人工发布：Actions 页面手动运行 `build` 并勾选 `publish`；发布后再从私人 `iOS.conf` 删去 `youtube` 行。
+- 观测结束时：保留 `iOS.conf` 还是恢复备份，是否删除临时证书 `5B974D20`。
+
+### 其余待办
+
+- 待办 6 的次要问题不变；macOS 第 3 阶段暂不做。
