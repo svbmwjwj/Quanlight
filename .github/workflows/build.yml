@@ -1,0 +1,51 @@
+name: build
+
+on:
+  schedule:
+    - cron: "0 18 * * *" # 02:00 Beijing time
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: https://cdn.jsdelivr.net/gh/${{ github.repository }}@release
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Unit tests
+        run: uv run pytest -q
+      - name: Build and check lists
+        run: uv run quanlight build --out dist --base-url "$BASE_URL"
+      - name: Probe lists
+        run: uv run quanlight probe --out dist/probe --base-url "$BASE_URL"
+      - name: Publish to release branch
+        run: |
+          set -euo pipefail
+          git fetch --depth 1 origin release:refs/remotes/origin/release || true
+          old_tree=$(git rev-parse -q --verify 'refs/remotes/origin/release^{tree}' || echo none)
+          cd dist
+          git init -q -b release
+          git add -A
+          new_tree=$(git write-tree)
+          if [ "$old_tree" = "$new_tree" ]; then
+            echo "No content change; release branch left as is."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "release: lists from ${GITHUB_SHA::7}"
+          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" release
+          git ls-files | while read -r path; do
+            curl -fsS -o /dev/null "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@release/${path}" || echo "purge failed: $path"
+          done

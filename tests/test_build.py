@@ -86,3 +86,20 @@ def test_upstream_empty_fails(tmp_path):
 def test_report_markdown_lists_errors(tmp_path):
     args = setup(tmp_path, extra_rule=r("host-suffix", "qq.com"))
     assert "qq.com" in build(**args).to_markdown()
+
+
+def test_diff_v2fly_reports_changes(tmp_path, capsys):
+    from quanlight.cli import main
+
+    bundles = tmp_path / "bundles"
+    bundles.mkdir()
+    rules = (
+        Rule("host-suffix", "sub.com", "core", "v2fly:svc-sub"),
+        Rule("host-suffix", "gone.com", "core", "v2fly:svc-sub"),
+    )
+    (bundles / "svc.toml").write_text(dump_bundle(Bundle("svc", "d", 10, rules)))
+    code = main(["diff-v2fly", "--bundles", str(bundles), "--v2fly-data", str(FIX / "v2fly")])
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "| svc | added | host-suffix, sub-cn.com |" in out
+    assert "| svc | removed | host-suffix, gone.com |" in out

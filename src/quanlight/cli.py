@@ -27,9 +27,9 @@ from .sources import (
     parse_dnsmasq,
     parse_telegram_cidr,
 )
-from .v2fly import expand, to_rules
+from .v2fly import diff, expand, to_rules
 
-DEFAULT_BASE_URL = "https://cdn.jsdelivr.net/gh/<owner>/quanlight@release"
+DEFAULT_BASE_URL = "https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release"
 UPSTREAM_PARSERS: dict[str, Callable[[str, str], list[Rule]]] = {"telegram-cidr": parse_telegram_cidr}
 
 
@@ -139,7 +139,7 @@ def build(
         (out_dir / "ios" / f"{lst.name}.list").write_text(text, encoding="utf-8")
     snippet = render_filter_remote(bundles, base_url)
     readme = (
-        "# quanlight lists\n\nGenerated from https://github.com/<owner>/quanlight. "
+        "# quanlight lists\n\nGenerated from https://github.com/svbmwjwj/quanlight. "
         "Replace `<proxy-policy>` with your own policy names.\n\n```\n[filter_remote]\n" + snippet + "```\n"
     )
     (out_dir / "README.md").write_text(readme, encoding="utf-8")
@@ -207,6 +207,23 @@ def _cmd_import(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_diff(args: argparse.Namespace) -> int:
+    data_dir = _v2fly_dir(args)
+    rows: list[str] = []
+    for bundle in load_bundles(args.bundles):
+        files = sorted({r.source.removeprefix("v2fly:") for r in bundle.rules if r.source.startswith("v2fly:")})
+        for name in files:
+            imported = to_rules(expand(data_dir, name, exclude=bundle.v2fly_exclude), source=f"v2fly:{name}")
+            scoped = dataclasses.replace(bundle, rules=tuple(r for r in bundle.rules if r.source == f"v2fly:{name}"))
+            added, removed = diff(scoped, imported)
+            rows += [f"| {bundle.name} | added | {r.type}, {r.value} |" for r in added]
+            rows += [f"| {bundle.name} | removed | {r.type}, {r.value} |" for r in removed]
+    lines = ["## v2fly upstream diff", ""]
+    lines += ["| bundle | change | rule |", "|---|---|---|", *rows] if rows else ["No changes."]
+    print("\n".join(lines))
+    return 0
+
+
 def _cmd_probe(args: argparse.Namespace) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     for case in PROBE_CASES:
@@ -234,6 +251,11 @@ def main(argv: list[str] | None = None) -> int:
     p_import.add_argument("--exclude", action="append", default=[])
     p_import.add_argument("--v2fly-data", type=Path)
     p_import.set_defaults(func=_cmd_import)
+
+    p_diff = sub.add_parser("diff-v2fly", help="report v2fly changes against bundle manifests")
+    p_diff.add_argument("--bundles", type=Path, default=Path("bundles"))
+    p_diff.add_argument("--v2fly-data", type=Path)
+    p_diff.set_defaults(func=_cmd_diff)
 
     p_probe = sub.add_parser("probe", help="write rule-matching probe lists")
     p_probe.add_argument("--out", type=Path, default=Path("dist/probe"))
