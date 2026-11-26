@@ -155,3 +155,10 @@ updated: 2026-11-26
 - 已合并：构建器改造（分支 `claude/proxy-fallback-whitelist-8db3f3`，至 `2eb64fe`）；`china.list` 约 1.2 万条（域名约 2400、大陆网段 9685）、约 400 KB；`apns.list` 1 条。
 - 本人自行做真机测试；首次发布在 Actions 手动运行 `build` 并勾选 `publish`。
 - 未做：D-025 分支合并、旧 worktree 清理。
+
+## 2026-11-26（收尾）
+
+- 已发布：`release` 为 `apns.list` 与 `china.list`；订阅 tag 为 `apns`、`china`，代理托底策略名 `hello world ：）`。
+- 本人手机改用精简配置，iOS 模板已按它更新；真机测试由本人自行进行，发现误走代理的国内域名再补进 `china.toml`。
+- 已清理：全部 worktree 与已合并分支、构建缓存、观测期的探针配置与旧备份。
+- 待办：`release` 上的 `probe/` 列表是第 1 阶段探针产物且文件名重复，可考虑不再随发布生成。
