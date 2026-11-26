@@ -161,7 +161,7 @@ v2fly 条目的导入映射（Claude）：
 | `full:` | `host` |
 | `keyword:` | 不导入，写进导入报告，需要时人工按 `host-keyword` 的约束补写 |
 | `regexp:` | 丢弃并计数（D-004） |
-| `include:` | 递归展开；每个包可声明排除的文件，例如 `google` 包排除 `include:youtube` |
+| `include:` | 递归展开；每个包可声明排除的文件（字段 `v2fly_exclude`） |
 | `@cn` | 标为 `cn-exception`；`domain:` 生成 `host-suffix` 例外，`full:` 生成 `host` 例外 |
 | `@ads` | 不导入 |
 
@@ -171,8 +171,7 @@ v2fly 条目的导入映射（Claude）：
 
 - `apns`：Apple 推送服务，单独成包，不与任何应用绑定（用户，D-008）。所有应用的推送都会经过它，节点中断时全部推送一起中断，这是已接受的取舍（用户）。
 - 首批服务包（用户：服务范围，D-012；拆分粒度见下，D-018）：
-  - `google`：含 Gmail、Google Play；不含 YouTube（用户，D-012）。
-  - `youtube`：单独成包（用户，D-012）。
+  - `google`：含 Gmail、Google Play 与 YouTube（用户，D-012；YouTube 并入 D-024）。
   - `telegram`、`twitter`、`github`、`linkedin`：沿用旧 `iOS.conf` 中已启用订阅的范围（用户，D-012）。
   - `claude`：尽可能完整，以 macOS 配置中整理的 Claude 规则为起点，补充 v2fly `anthropic` 文件（用户，D-012）。
   - `crypto`：Rainbow、Phantom、Kraken、Uniswap、Etherscan、Hyperliquid、Arweave、IPFS 与它们共用的 WalletConnect 中继合并为一个包（用户，D-018；选择依据见私密笔记）。

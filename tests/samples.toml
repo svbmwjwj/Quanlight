@@ -54,11 +54,11 @@ expect = "linkedin"
 
 [[sample]]
 host = "www.youtube.com"
-expect = "youtube"
+expect = "google"
 
 [[sample]]
 host = "i.ytimg.com"
-expect = "youtube"
+expect = "google"
 
 [[sample]]
 host = "www.bilibili.com"
