@@ -59,7 +59,7 @@ Quantumult X 远程列表可用的规则类型以官方 `sample.conf` 为准：`
 各类型的补充约束（Claude，D-009）：
 
 - `host-suffix`：共享平台的例子有 `akadns.net`、`akamaized.net`、`cloudfront.net`、`amazonaws.com`。
-- `host-wildcard`：`*` 能否跨多级、是否匹配裸域名，官方没有说明，用前先经探针验证（待调研）。
+- `host-wildcard`：`*.example.com` 不匹配裸域名 `example.com`（Claude，D-019）；`*` 能否跨多级尚未验证（待调研）。
 - `host-keyword`：只有当关键词在检查数据集中零命中，且无法用前三种主机规则表达时才允许，并须在清单里写明理由。
 - `ip-cidr`、`ip6-cidr`：IP 规则在域名解析之后匹配，任何解析到这些网段的域名都会被命中，所以网段必须专属于该服务。
 - `ip-asn`：必须在清单里记录归属核实的来源与日期，如 bgp.tools 的查询结果；检查数据集无法校验 ASN 的覆盖范围。
@@ -244,7 +244,7 @@ final, direct
 
 任一步骤失败，整次构建失败，发布分支保留上一版，由 GitHub 默认的失败邮件通知（Claude）。
 
-模拟器暂按“`[filter_local]` 先于 `[filter_remote]`，远程列表按订阅顺序逐条匹配”实现；主机名未命中时才解析 IP 再匹配 IP 规则（Claude）。社区另有“按规则类型分优先级”的说法[^1]，两种语义下例外都排在最前，结论一致；真机探针验证后再定是否调整模拟器（待调研）。
+模拟器按真机探针确认的语义实现：`[filter_local]` 先于 `[filter_remote]`；`host` 先于 `host-suffix`，即使 `host` 所在的列表排在后面；同类型内按订阅顺序；主机名未命中时才解析 IP 再匹配 IP 规则（Claude，D-019）。现有构建器仍是“列表顺序优先”的旧模型，需要修改（待定）。
 
 ## 匹配语义探针
 
@@ -266,7 +266,7 @@ final, direct
 - 发布说明同时给出 GitHub 版与境内版的 `[filter_remote]` 片段（Claude，D-015）。
 - 个人配置直接订阅本仓库发布的列表，不再订阅他人加工的列表；第 2 阶段的服务包建成前，尚未覆盖的服务暂时保留原有订阅（用户：直接引用自己的规则集；过渡安排 Claude，D-014）。
 - 模板：仓库的 `templates/` 提供去除私人订阅、密钥、节点检测脚本、MITM 证书与个人域名的 iOS、macOS 配置模板；本人的实际配置只放在 `~/.config/quanlight/configs/`（用户，D-016）。
-- 更新：每日构建一次；清单改动推送到 `main` 时也触发（Claude）。
+- 更新：自动流程只检测各来源的变化并试构建；发布在真机检测或探针之后由人工触发，不设固定周期；配置中的规则集不设置自动更新时间（用户，D-020）。现有工作流仍是每日自动发布，尚未按此修改（待定）。
 - 许可证：构建代码与产物均为 MIT；NOTICE 列出 v2fly（MIT，保留其版权声明）与 Telegram 官方网段等来源（Claude，D-013）。
 
 ## macOS 白名单
@@ -287,7 +287,8 @@ final, direct
 - [x] iOS 首批服务包的范围（D-012）。
 - [x] iOS 产物的许可证：MIT（D-013）。
 - [ ] APNs 实际使用的 IP 网段（待调研）。
-- [ ] Quantumult X 的匹配语义、`host-wildcard` 语义、CNAME 是否参与匹配，由探针验证（待调研）。
+- [x] Quantumult X 的匹配语义：本地先于远程、`host` 先于 `host-suffix`、同类型按顺序、通配符不匹配裸域名、主机规则不匹配 CNAME 目标（D-019）。
+- [ ] “分流匹配优化”开关的影响，以及 `host-suffix`、`host-wildcard`、`host-keyword` 之间的优先级（待调研）。
 - [ ] jsDelivr 与 GitHub 地址在大陆直连的可用性（待调研）。
 - [ ] macOS 未命中的域名是否先查 DNS（待定）。
 
