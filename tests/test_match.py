@@ -50,7 +50,37 @@ def test_overlap_mixed_versions():
 def test_route_order_and_ip_fallback():
     first = RuleList("a", "policy-a", (r("host-suffix", "example.com"),))
     second = RuleList("b", "policy-b", (r("host", "www.example.com"), r("ip-cidr", "10.0.0.0/8")))
-    assert route([first, second], "www.example.com", None, final="direct") == "policy-a"
+    assert route([first, second], "www.example.com", None, final="direct") == "policy-b"
+    assert route([first, second], "api.example.com", None, final="direct") == "policy-a"
     assert route([first, second], "other.net", ip_address("10.1.2.3"), final="direct") == "policy-b"
     assert route([first, second], "other.net", ip_address("8.8.8.8"), final="direct") == "direct"
     assert route([first, second], None, None, final="direct") == "direct"
+
+
+# 以下用例对应 D-019 真机探针的结果。
+
+
+def test_route_host_in_later_list_beats_suffix_in_earlier_list():
+    earlier = RuleList("reject", "reject", (r("host-suffix", "example.org"),))
+    later = RuleList("direct", "direct", (r("host", "www.example.org"),))
+    assert route([earlier, later], "www.example.org", None, final="proxy") == "direct"
+
+
+def test_route_same_type_earlier_list_wins():
+    earlier = RuleList("reject", "reject", (r("host-suffix", "example.com"),))
+    later = RuleList("direct", "direct", (r("host-suffix", "example.com"),))
+    assert route([earlier, later], "www.example.com", None, final="proxy") == "reject"
+
+
+def test_route_wildcard_does_not_match_bare_domain():
+    lists = [RuleList("reject", "reject", (r("host-wildcard", "*.iana.org"),))]
+    assert route(lists, "www.iana.org", None, final="direct") == "reject"
+    assert route(lists, "iana.org", None, final="direct") == "direct"
+
+
+def test_route_provisional_suffix_wildcard_keyword_order():
+    keyword = RuleList("k", "k", (r("host-keyword", "example"),))
+    wildcard = RuleList("w", "w", (r("host-wildcard", "*.example.net"),))
+    suffix = RuleList("s", "s", (r("host-suffix", "example.net"),))
+    assert route([keyword, wildcard, suffix], "a.example.net", None, final="direct") == "s"
+    assert route([keyword, wildcard], "a.example.net", None, final="direct") == "w"

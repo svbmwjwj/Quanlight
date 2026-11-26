@@ -244,7 +244,9 @@ final, direct
 
 任一步骤失败，整次构建失败，发布分支保留上一版，由 GitHub 默认的失败邮件通知（Claude）。
 
-模拟器按真机探针确认的语义实现：`[filter_local]` 先于 `[filter_remote]`；`host` 先于 `host-suffix`，即使 `host` 所在的列表排在后面；同类型内按订阅顺序；主机名未命中时才解析 IP 再匹配 IP 规则（Claude，D-019）。现有构建器仍是“列表顺序优先”的旧模型，需要修改（待定）。
+模拟器按真机探针确认的语义实现，误伤检查与样本测试共用同一语义：先按规则类型，同类型内按订阅顺序，排在前面的列表先命中；主机规则都未命中时才按订阅顺序匹配 IP 规则，再落到 `FINAL`（Claude，D-019）。模拟的列表只有 `[filter_remote]` 中的各包，直连例外是其中第一个；`[filter_local]` 只有 `final`，不参与模拟。
+
+主机规则类型的顺序为 `host`、`host-suffix`、`host-wildcard`、`host-keyword`；其中 `host` 先于 `host-suffix` 已由探针确认，后三者之间的先后暂按社区说法，尚未实测（Claude，待调研）。
 
 ## 匹配语义探针
 

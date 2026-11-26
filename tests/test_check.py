@@ -8,6 +8,7 @@ from quanlight.check import (
     find_misfires,
     overdue_broad,
 )
+from quanlight.match import RuleList
 from quanlight.model import Bundle, Rule
 
 
@@ -83,3 +84,19 @@ def test_misfire_wildcard_and_keyword_under_cn_domain():
     for rule in (r("host-wildcard", "*.qq.com"), r("host-keyword", ".qq.com", reason="x"), r("host-wildcard", "*.mail.qq.com")):
         misfires = find_misfires(build_ios_lists([b("svc", 10, rule)], []), {"qq.com"}, [])
         assert [(m.bundle, m.target) for m in misfires] == [("svc", "qq.com")], rule
+
+
+def test_misfire_uses_type_priority_across_lists():
+    # 后面列表的 host 规则先于前面列表的 host-suffix 直连例外（D-019）。
+    google = b("google", 10, r("host-suffix", "google.com"), r("host-suffix", "dl.google.com", role="cn-exception"))
+    other = b("other", 20, r("host", "dl.google.com"))
+    lists = build_ios_lists([google, other], direct_exceptions([google, other]))
+    misfires = find_misfires(lists, {"dl.google.com"}, [])
+    assert [(m.bundle, m.rule.type, m.target) for m in misfires] == [("other", "host", "dl.google.com")]
+
+
+def test_misfire_later_direct_suffix_beats_earlier_wildcard():
+    # 暂定顺序：host-suffix 先于 host-wildcard，与列表先后无关。
+    proxy = RuleList("svc", "svc", (r("host-wildcard", "*.example.cn"),))
+    direct = RuleList("direct-exceptions", "direct", (r("host-suffix", "a.example.cn"),))
+    assert find_misfires([proxy, direct], {"a.example.cn"}, []) == []
