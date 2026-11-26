@@ -5,7 +5,7 @@ updated: 2026-11-26
 
 # Quanlight 交接
 
-## 2026-11-26
+## 2026-11-26（初版）
 
 ### 必读
 
@@ -55,3 +55,41 @@ updated: 2026-11-26
    - 工作流令牌作用域过宽；读取 `release` 失败时仍会推送；jsDelivr 刷新无重试。
    - LinkedIn 两条 `*-msedge.net` 可能是 CNAME 目标；IPFS 缺 `dweb.link` 等网关。
    - Uniswap、Etherscan、Hyperliquid 的来源仍写旧配置，每周差异报告跟踪不到。
+
+## 2026-11-26（协调会话）
+
+### 状态更新
+
+- 手机：本人确认已从 iCloud 备份恢复 Quantumult X 配置，MitM 已重新打开。
+- 决策编号预留：D-021 本会话已写；D-022 归官方 IP 数据子对话；D-023 归发布流程子对话；D-024 归匹配模型子对话。
+
+### 本人决定
+
+- 待办 4a：GitHub `api.github.com/meta` 与 Google `goog.json` 两者都接入为官方数据（D-022，由子对话写）。
+- 待办 4b：Telegram、Twitter、GitHub、LinkedIn 保持独立成包（D-021，已写入设计文档“服务包”一节）。
+- 待办 3：稍后再开，等匹配模型改完、本人在手机旁时进行。
+- 规则集自动更新：官方 `sample.conf` 写明省略 `update-interval` 时默认每 86400 秒同步一次；本人决定写 `update-interval=-1` 关闭自动同步（D-023，由发布流程子对话写）。
+
+### 子对话
+
+各在自己的 worktree 分支上提交，不推送、不合并；合并到 `main` 前须经本人同意。
+
+- 待办 1，匹配模型：会话 `match-type-priority`，分支名含 `type-priority-matching`；只改 `match.py`、`check.py`、相关测试与设计文档“构建与检查”一节。
+- 待办 2，发布流程：会话 `manual-release`，分支名含 `manual-release`；只改工作流、模板、私人配置与设计文档“发布与订阅”一节。
+- 待办 4a，官方 IP 数据：会话 `official-ip-upstreams`，分支名含 `official-ip-upstreams`；只改 github、google 清单、上游同步代码与设计文档“参考数据的导入”一节。
+
+### 仍待开始
+
+- 待办 3：真机观测，用 Quantumult X 自带的配置编辑与 MitM 加“HTTP 抓取”，本人在场安装临时证书。
+- 待办 5、6 不变。
+
+### 子对话结果（均未推送、未合并）
+
+- 待办 1：分支 `claude/type-priority-matching-c9041b`，提交 `c7b715a`；71 个测试通过，构建产物与改动前逐字节相同。类型顺序 `host` > `host-suffix` > `host-wildcard` > `host-keyword`，后三者为社区说法、暂定；D-024 未用。
+- 待办 2：分支 `claude/manual-release-8b7666`，提交 `40148f4`、`8f816a0`、`9de75c7`；65 个测试通过。定时与推送只做试构建并在 Actions 摘要中报告与 `release` 的差异；发布须在 Actions 页面手动运行 `build` 并勾选 `publish`；读取 `release` 失败时发布直接失败。`[filter_remote]` 统一 `update-interval=-1`（D-023），节点与重写订阅不变。工作流 YAML 只做了解析，未跑 actionlint。
+- 待办 4a：分支 `claude/official-ip-upstreams-55f065`，提交 `e3b6eff`、`0e0d97d`；80 个测试通过，构建通过，与大陆网段无重叠。GitHub 取 `web`、`api`、`git`、`packages`、`copilot` 共 184 段；Google 取全部 148 段（D-022）。
+
+### 新发现的待议事项
+
+- 包顺序检查：`cross_check()` 的“更具体的包在前”仍按列表顺序判断；类型优先后，前面包的 `host-suffix` 不再遮住后面包的 `host`，`claude` 须排在 `google` 前这条约束可能过严。
+- YouTube 的 IP：`goog.json` 含 YouTube 服务器网段，`youtube` 包没有 IP 规则，只凭 IP 访问的 YouTube 流量会命中 `google` 列表。
