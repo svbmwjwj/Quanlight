@@ -4,7 +4,7 @@ created: 2026-11-26
 updated: 2026-11-26
 type: overturn
 source: user
-status: active
+status: superseded
 supersedes: D-012
 doc: notes/rule-repo-design.md
 ---
