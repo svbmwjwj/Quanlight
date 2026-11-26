@@ -93,3 +93,12 @@ updated: 2026-11-26
 
 - 包顺序检查：`cross_check()` 的“更具体的包在前”仍按列表顺序判断；类型优先后，前面包的 `host-suffix` 不再遮住后面包的 `host`，`claude` 须排在 `google` 前这条约束可能过严。
 - YouTube 的 IP：`goog.json` 含 YouTube 服务器网段，`youtube` 包没有 IP 规则，只凭 IP 访问的 YouTube 流量会命中 `google` 列表。
+
+### 合并与后续（同日）
+
+- 三个子对话的分支已合并进 `main`（`9347daf`、`b7f1298`、`32883d0`），合并后测试与本地构建通过。
+- YouTube 并入 `google` 包（本人决定，D-024，`c83eb5f`）。发布后 `release` 不再有 `ios/youtube.list`；私人配置 `iOS.conf` 的 `youtube` 行要在发布之后再删，之前删会让 YouTube 暂时失去代理。
+- 包顺序检查改为对每条 `host`、`host-suffix`、`host-wildcard` 规则用模拟器实际路由，须先命中本包（`f0e895f`）。原检查对“后面包的 `host` 落在前面包的 `host-suffix` 下”误报，且不检查通配符被后面包的后缀抢走的情况。
+- 待办 3 已开子对话 `device-observation`，本人在场；它负责 claude、apns、telegram、twitter、github、linkedin、crypto 清单，google 相关发现只写进报告。另请它验证 Telegram 等应用的通知在 APNs 走代理时能到达（本人指出 APNs 必须走代理）。
+- macOS 第 3 阶段：本人决定暂不做。
+- 首次人工发布：等真机观测通过后，在 Actions 页面手动运行 `build` 并勾选 `publish`。
