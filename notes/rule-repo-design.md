@@ -97,6 +97,7 @@ quanlight/
   .github/workflows/
     build.yml               # 每日与推送 main 时构建、检查、发布
     upstream-diff.yml       # 每周对比参考数据，生成差异报告
+  templates/                # 去除隐私信息的 iOS 与 macOS 配置模板
   notes/                    # 设计文档与决策日志
   pyproject.toml
   uv.lock
@@ -260,7 +261,11 @@ final, direct
 ## 发布与订阅
 
 - 分支：`main` 放清单、源码与测试；`release` 只放产物，每次构建强制覆盖为单个提交（Claude）。
-- 订阅地址：`https://cdn.jsdelivr.net/gh/<账号>/quanlight@release/<文件>`；jsDelivr 在大陆直连是否稳定未核实，README 同时给出 `raw.githubusercontent.com` 的备用地址（Claude，待调研）。
+- 订阅地址：GitHub `https://raw.githubusercontent.com/svbmwjwj/quanlight/release/<文件>` 为主（Claude，D-015）。
+- 境内备用：`ghfast.top` 代理的 GitHub 地址，实测在大陆网络下可直连；jsDelivr 的 `fastly`、`cdn` 两个节点也列出，能否稳定直连待真机确认（用户：须有境内可用的备用链接；具体地址 Claude，D-015）。第三方代理能看到并改动所转发的内容，这是已知风险。
+- 发布说明同时给出 GitHub 版与境内版的 `[filter_remote]` 片段（Claude，D-015）。
+- 个人配置直接订阅本仓库发布的列表，不再订阅他人加工的列表；第 2 阶段的服务包建成前，尚未覆盖的服务暂时保留原有订阅（用户：直接引用自己的规则集；过渡安排 Claude，D-014）。
+- 模板：仓库的 `templates/` 提供去除私人订阅、密钥、节点检测脚本、MITM 证书与个人域名的 iOS、macOS 配置模板；本人的实际配置只放在 `~/.config/quanlight/configs/`（用户，D-016）。
 - 更新：每日构建一次；清单改动推送到 `main` 时也触发（Claude）。
 - 许可证：构建代码与产物均为 MIT；NOTICE 列出 v2fly（MIT，保留其版权声明）与 Telegram 官方网段等来源（Claude，D-013）。
 
@@ -283,7 +288,7 @@ final, direct
 - [x] iOS 产物的许可证：MIT（D-013）。
 - [ ] APNs 实际使用的 IP 网段（待调研）。
 - [ ] Quantumult X 的匹配语义、`host-wildcard` 语义、CNAME 是否参与匹配，由探针验证（待调研）。
-- [ ] jsDelivr 在大陆直连的可用性（待调研）。
+- [ ] jsDelivr 与 GitHub 地址在大陆直连的可用性（待调研）。
 - [ ] macOS 未命中的域名是否先查 DNS（待定）。
 
 [^1]: 官方 `sample.conf` 第 276～277 行只说明 `host-keyword, .` 会跳过未命中域名的 DNS 查询，且纯 IP 请求不被主机类规则匹配；类型优先级出自 limbopro.com/archives/30471.html，未经官方证实。
