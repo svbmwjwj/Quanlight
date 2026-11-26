@@ -11,6 +11,9 @@ from .model import HOST_TYPES, ROLES, RULE_TYPES, Bundle, Rule, normalize_host
 
 _HOST_RE = re.compile(r"^[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?(\.[a-z0-9_]([a-z0-9_-]*[a-z0-9_])?)*$")
 _WILDCARD_RE = re.compile(r"^[a-z0-9_.*?-]+$")
+_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+# Names the build uses for its own lists and policies.
+RESERVED_NAMES = frozenset({"direct", "direct-exceptions", "reject", "proxy"})
 
 
 def _normalize_value(type_: str, value: str) -> str:
@@ -43,7 +46,19 @@ def load_bundle(path: Path) -> Bundle:
         upstream=tuple(t["kind"] for t in data.get("upstream", ())),
         uses=tuple(data.get("uses", ())),
         v2fly_exclude=tuple(data.get("v2fly_exclude", ())),
+        v2fly_ignore=tuple(normalize_host(v) for v in data.get("v2fly_ignore", ())),
     )
+
+
+def check_bundle_files(directory: Path) -> list[str]:
+    """Each manifest's name must equal its file stem, which also keeps names unique."""
+    errors = []
+    for path in sorted(directory.glob("*.toml")):
+        with path.open("rb") as fh:
+            name = tomllib.load(fh).get("name")
+        if name != path.stem:
+            errors.append(f"{path.name}: name {name!r} must equal the file name {path.stem!r}")
+    return errors
 
 
 def load_bundles(directory: Path) -> list[Bundle]:
@@ -73,6 +88,8 @@ def _value_error(rule: Rule) -> str | None:
 
 def validate_bundle(bundle: Bundle, today: date) -> list[str]:
     errors: list[str] = []
+    if not _NAME_RE.match(bundle.name) or bundle.name in RESERVED_NAMES:
+        errors.append(f"{bundle.name!r}: bundle name must be kebab-case and not one of {sorted(RESERVED_NAMES)}")
     for rule in bundle.rules:
         where = f"{bundle.name}: {rule.type}, {rule.value}"
         if rule.type not in RULE_TYPES:
@@ -117,6 +134,8 @@ def dump_bundle(bundle: Bundle) -> str:
         lines.append(f"uses = {_arr(bundle.uses)}")
     if bundle.v2fly_exclude:
         lines.append(f"v2fly_exclude = {_arr(bundle.v2fly_exclude)}")
+    if bundle.v2fly_ignore:
+        lines.append(f"v2fly_ignore = {_arr(bundle.v2fly_ignore)}")
     for rule in bundle.rules:
         lines += ["", "[[rule]]", f"type = {_s(rule.type)}", f"value = {_s(rule.value)}",
                   f"role = {_s(rule.role)}", f"source = {_s(rule.source)}"]

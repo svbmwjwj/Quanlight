@@ -77,3 +77,9 @@ def test_overdue_broad():
     old = r("host-suffix", "sentry.io", breadth="broad", reason="r", review_by=date(2026, 1, 1))
     fresh = r("host-suffix", "intercom.io", breadth="broad", reason="r", review_by=date(2027, 1, 1))
     assert overdue_broad([b("c", 1, old, fresh)], date(2026, 11, 26)) == [old]
+
+
+def test_misfire_wildcard_and_keyword_under_cn_domain():
+    for rule in (r("host-wildcard", "*.qq.com"), r("host-keyword", ".qq.com", reason="x"), r("host-wildcard", "*.mail.qq.com")):
+        misfires = find_misfires(build_ios_lists([b("svc", 10, rule)], []), {"qq.com"}, [])
+        assert [(m.bundle, m.target) for m in misfires] == [("svc", "qq.com")], rule

@@ -1,6 +1,7 @@
 name = "telegram"
 description = "Telegram apps, web, Telegraph and Fragment"
 order = 40
+v2fly_ignore = ["ton.org", "toncenter.com"]
 
 [[rule]]
 type = "host-suffix"

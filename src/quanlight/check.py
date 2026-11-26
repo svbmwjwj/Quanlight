@@ -87,6 +87,20 @@ def _parent_in(host: str, domains: set[str]) -> str | None:
     return None
 
 
+# A label no real service uses, to stand for "any subdomain" of a mainland domain.
+_ANY_LABEL = "zz9-quanlight-any"
+
+
+def _literal_tail(rule: Rule) -> str | None:
+    """Host part a rule targets, for host, suffix and wildcard rules."""
+    if rule.type in ("host", "host-suffix"):
+        return rule.value
+    if rule.type == "host-wildcard":
+        tail = rule.value[max(rule.value.rfind("*"), rule.value.rfind("?")) + 1 :].lstrip(".")
+        return tail or None
+    return None
+
+
 def find_misfires(
     lists: Sequence[RuleList], cn_domains: Iterable[str], cn_networks: Iterable[IPNetwork]
 ) -> list[Misfire]:
@@ -99,17 +113,21 @@ def find_misfires(
             return
         found.setdefault((rule_list.name, rule.type, rule.value, target), Misfire(rule_list.name, rule, target))
 
-    # A mainland domain (and everything under it) must route direct.
+    # A mainland domain and its subdomains must route direct.
     for domain in domains:
-        if (hit := _first_match(indexed, domain)) is not None:
-            record(hit[0], hit[1], domain)
+        for host in (domain, f"{_ANY_LABEL}.{domain}"):
+            if (hit := _first_match(indexed, host)) is not None:
+                record(hit[0], hit[1], domain)
     # A proxy rule must not target a host that lies under a mainland domain.
     for rule_list, _ in indexed:
         for rule in rule_list.rules:
-            if rule.type in ("host", "host-suffix") and (parent := _parent_in(rule.value, domains)):
-                hit = _first_match(indexed, rule.value)
-                if hit is not None and hit[0].policy != "direct":
-                    record(rule_list, rule, parent)
+            tail = _literal_tail(rule)
+            if tail is None or (parent := _parent_in(tail, domains)) is None:
+                continue
+            probe = tail if rule.type != "host-wildcard" else f"{_ANY_LABEL}.{tail}"
+            hit = _first_match(indexed, probe)
+            if hit is not None and hit[0].policy != "direct":
+                record(rule_list, rule, parent)
     # Proxy networks must not overlap mainland networks.
     networks = list(cn_networks)
     for rule_list in lists:

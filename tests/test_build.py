@@ -103,3 +103,22 @@ def test_diff_v2fly_reports_changes(tmp_path, capsys):
     assert code == 0
     assert "| svc | added | host-suffix, sub-cn.com |" in out
     assert "| svc | removed | host-suffix, gone.com |" in out
+
+
+def test_build_refuses_to_wipe_foreign_out_dir(tmp_path):
+    args = setup(tmp_path)
+    foreign = tmp_path / "precious"
+    foreign.mkdir()
+    (foreign / "keep.txt").write_text("keep")
+    args["out_dir"] = foreign
+    report = build(**args)
+    assert report.errors
+    assert (foreign / "keep.txt").read_text() == "keep"
+
+
+def test_build_replaces_its_own_previous_output(tmp_path):
+    args = setup(tmp_path)
+    assert build(**args).errors == []
+    (args["out_dir"] / "ios" / "stale.list").write_text("old")
+    assert build(**args).errors == []
+    assert not (args["out_dir"] / "ios" / "stale.list").exists()

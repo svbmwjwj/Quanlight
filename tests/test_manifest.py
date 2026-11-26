@@ -105,3 +105,17 @@ def test_dump_roundtrip(tmp_path):
     )
     path = write(tmp_path, dump_bundle(original))
     assert load_bundle(path) == original
+
+
+def test_validate_rejects_bad_and_reserved_names():
+    for name in ("direct", "direct-exceptions", "Bad Name", "a/b", "x,y"):
+        bundle = Bundle(name=name, description="d", order=1, rules=())
+        assert validate_bundle(bundle, TODAY), name
+
+
+def test_check_bundle_files_requires_name_to_match_file(tmp_path):
+    from quanlight.manifest import check_bundle_files
+
+    (tmp_path / "telegram.toml").write_text('name = "other"\ndescription = "d"\norder = 1\n')
+    errors = check_bundle_files(tmp_path)
+    assert any("telegram.toml" in e for e in errors)

@@ -39,7 +39,7 @@ def _parse_line(line: str) -> tuple[str, list[str]] | None:
 def expand(data_dir: Path, name: str, exclude: Iterable[str] = ()) -> list[Entry]:
     excluded = set(exclude)
 
-    def walk(current: str, want: frozenset[str], deny: frozenset[str], stack: tuple[str, ...]) -> list[Entry]:
+    def walk(current: str, stack: tuple[str, ...]) -> list[Entry]:
         if current in stack:
             raise V2flyError(f"include cycle: {' -> '.join(stack + (current,))}")
         path = data_dir / current
@@ -55,20 +55,18 @@ def expand(data_dir: Path, name: str, exclude: Iterable[str] = ()) -> list[Entry
                 target = head.removeprefix("include:")
                 if target in excluded:
                     continue
-                sub_want = frozenset(t[1:] for t in attr_tokens if not t.startswith("@-"))
-                sub_deny = frozenset(t[2:] for t in attr_tokens if t.startswith("@-"))
-                out += walk(target, sub_want, sub_deny, stack + (current,))
+                want = frozenset(t[1:] for t in attr_tokens if not t.startswith("@-"))
+                deny = frozenset(t[2:] for t in attr_tokens if t.startswith("@-"))
+                # The filter applies to the fully expanded include, nested files included.
+                out += [e for e in walk(target, stack + (current,)) if want <= e.attrs and not e.attrs & deny]
                 continue
             kind, _, value = head.partition(":") if ":" in head else ("domain", "", head)
-            attrs = frozenset(t[1:] for t in attr_tokens)
-            if not want <= attrs or attrs & deny:
-                continue
             if kind not in ("keyword", "regexp"):
                 value = normalize_host(value)
-            out.append(Entry(kind=kind, value=value, attrs=attrs, file=current))
+            out.append(Entry(kind=kind, value=value, attrs=frozenset(t[1:] for t in attr_tokens), file=current))
         return out
 
-    return walk(name, frozenset(), frozenset(), ())
+    return walk(name, ())
 
 
 def to_rules(entries: Iterable[Entry], source: str) -> ImportResult:
@@ -98,7 +96,8 @@ def to_rules(entries: Iterable[Entry], source: str) -> ImportResult:
 
 def diff(bundle: Bundle, imported: ImportResult) -> tuple[list[Rule], list[Rule]]:
     """Return (rules upstream added, v2fly-sourced rules upstream no longer has)."""
-    upstream = {(r.type, r.value): r for r in imported.rules}
+    ignored = set(bundle.v2fly_ignore)
+    upstream = {(r.type, r.value): r for r in imported.rules if r.value not in ignored}
     current = {(r.type, r.value): r for r in bundle.rules if r.source.startswith("v2fly:")}
     added = [r for key, r in upstream.items() if key not in current]
     removed = [r for key, r in current.items() if key not in upstream]

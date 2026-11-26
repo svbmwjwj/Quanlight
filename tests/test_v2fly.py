@@ -71,3 +71,13 @@ def test_diff():
     added, removed = diff(bundle, imported)
     assert [(r.type, r.value) for r in added] == [("host-suffix", "sub-cn.com")]
     assert [(r.type, r.value) for r in removed] == [("host-suffix", "gone.com")]
+
+
+def test_expand_filter_applies_to_nested_includes():
+    assert values(expand(DATA, "nest-top")) == ["leafcn.com", "midcn.com"]
+
+
+def test_diff_skips_ignored_values():
+    imported = to_rules(expand(DATA, "svc-sub"), source="v2fly:svc-sub")
+    bundle = Bundle("svc", "d", 1, (Rule("host-suffix", "sub.com", "core", "v2fly:svc-sub"),), v2fly_ignore=("sub-cn.com",))
+    assert diff(bundle, imported) == ([], [])

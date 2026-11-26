@@ -31,6 +31,7 @@ class Bundle:
     upstream: tuple[str, ...] = ()
     uses: tuple[str, ...] = ()
     v2fly_exclude: tuple[str, ...] = ()
+    v2fly_ignore: tuple[str, ...] = ()  # upstream values deliberately left out of the bundle
 
 
 def normalize_host(value: str) -> str:

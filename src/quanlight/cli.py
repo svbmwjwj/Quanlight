@@ -16,7 +16,7 @@ from pathlib import Path
 from . import fetch
 from .check import build_ios_lists, cross_check, direct_exceptions, find_misfires
 from .emit import PROBE_CASES, render_filter_remote, render_list, render_probe
-from .manifest import dump_bundle, load_bundles, validate_bundle
+from .manifest import check_bundle_files, dump_bundle, load_bundles, validate_bundle
 from .match import IPNetwork, route
 from .model import Bundle, Rule
 from .sources import (
@@ -29,6 +29,7 @@ from .sources import (
 )
 from .v2fly import diff, expand, to_rules
 
+OUTPUT_MARKER = ".quanlight-dist"  # marks a directory this tool may replace
 DEFAULT_BASE_URL = "https://cdn.jsdelivr.net/gh/svbmwjwj/quanlight@release"
 UPSTREAM_PARSERS: dict[str, Callable[[str, str], list[Rule]]] = {"telegram-cidr": parse_telegram_cidr}
 
@@ -111,6 +112,7 @@ def build(
     static_files: Sequence[Path],
 ) -> BuildReport:
     report = BuildReport(provenance=dict(data.provenance))
+    report.errors += check_bundle_files(bundles_dir)
     bundles: list[Bundle] = []
     list_provenance: dict[str, dict[str, str]] = {}
     for bundle in load_bundles(bundles_dir):
@@ -131,9 +133,13 @@ def build(
     if report.errors:
         return report
 
+    if out_dir.exists() and any(out_dir.iterdir()) and not (out_dir / OUTPUT_MARKER).exists():
+        report.errors.append(f"refusing to replace {out_dir}: not empty and not a previous quanlight output")
+        return report
     if out_dir.exists():
         shutil.rmtree(out_dir)
     (out_dir / "ios").mkdir(parents=True)
+    (out_dir / OUTPUT_MARKER).write_text("", encoding="utf-8")
     for lst in lists:
         text = render_list(lst.name, lst.rules, list_provenance.get(lst.name, {}))
         (out_dir / "ios" / f"{lst.name}.list").write_text(text, encoding="utf-8")
