@@ -1,0 +1,22 @@
+[project]
+name = "quanlight"
+version = "0.1.0"
+description = "Build Quantumult X filter lists from reviewed service bundle manifests"
+readme = "README.md"
+authors = [
+    { name = "svbmwjwj", email = "255624542+svbmwjwj@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+quanlight = "quanlight.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
