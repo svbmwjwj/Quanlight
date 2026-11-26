@@ -1,0 +1,9 @@
+name = "apns"
+description = "Apple Push Notification service, shared by every app"
+order = 10
+
+[[rule]]
+type = "host-suffix"
+value = "push.apple.com"
+role = "core"
+source = "manual"
