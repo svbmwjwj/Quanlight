@@ -151,7 +151,7 @@ kind = "telegram-cidr"      # 官方网段，每次构建同步
 
 - 冻结：v2fly 等参考数据由导入工具一次性写进 TOML，构建时不读取；上游变化不会自动进入产物。
 - 差异报告：每周对比一次参考数据与清单，新增和删除的条目写成 Actions 摘要，由人审阅后再改清单。
-- 例外：`[[upstream]]` 只用于官方公布、语义稳定的数据，例如 Telegram 官方网段，每次构建同步。
+- 例外：`[[upstream]]` 只用于官方公布、语义稳定的数据，每次构建同步：Telegram 官方网段、GitHub `api.github.com/meta` 与 Google `goog.json`（用户，D-022）。
 
 v2fly 条目的导入映射（Claude）：
 
