@@ -6,7 +6,7 @@ from datetime import date
 from fnmatch import fnmatchcase
 import ipaddress
 
-from .match import HOST_TYPE_PRIORITY, IPNetwork, RuleList, networks_overlap, rule_matches_host
+from .match import HOST_TYPE_PRIORITY, IPNetwork, RuleList, networks_overlap, route, rule_matches_host
 from .model import HOST_TYPES, Bundle, Rule
 
 
@@ -151,7 +151,6 @@ def find_misfires(
 def cross_check(bundles: Sequence[Bundle]) -> list[str]:
     errors: list[str] = []
     ordered = _ordered(bundles)
-    rank = {b.name: i for i, b in enumerate(ordered)}
     owners: dict[tuple[str, str], str] = {}
     for bundle in ordered:
         for rule in proxy_rules(bundle):
@@ -159,21 +158,21 @@ def cross_check(bundles: Sequence[Bundle]) -> list[str]:
             if key in owners and owners[key] != bundle.name:
                 errors.append(f"duplicate rule {rule.type}, {rule.value} in {owners[key]} and {bundle.name}")
             owners.setdefault(key, bundle.name)
-    for broad in ordered:
-        for narrow in ordered:
-            if broad.name == narrow.name or rank[broad.name] > rank[narrow.name]:
+    # 按 D-019 的路由模型逐条试探：每条主机规则的值都应先命中本包，否则被别的包遮住
+    lists = [RuleList(b.name, b.name, tuple(proxy_rules(b))) for b in ordered]
+    for bundle in ordered:
+        for rule in proxy_rules(bundle):
+            if rule.type not in ("host", "host-suffix", "host-wildcard"):
                 continue
-            for n_rule in proxy_rules(narrow):
-                if n_rule.type not in ("host", "host-suffix"):
-                    continue
-                for b_rule in proxy_rules(broad):
-                    if (b_rule.type, b_rule.value) != (n_rule.type, n_rule.value) and rule_matches_host(
-                        b_rule, n_rule.value
-                    ):
-                        errors.append(
-                            f"{broad.name} ({b_rule.type}, {b_rule.value}) covers "
-                            f"{narrow.name} ({n_rule.type}, {n_rule.value}); order {narrow.name} first"
-                        )
+            if owners[(rule.type, rule.value)] != bundle.name:
+                continue
+            probe = rule.value.replace("*", "a").replace("?", "a")
+            winner = route(lists, probe, None, final="")
+            if winner != bundle.name:
+                errors.append(
+                    f"{winner} matches {probe} before {bundle.name} ({rule.type}, {rule.value}); "
+                    "reorder bundles or narrow the rule"
+                )
     return errors
 
 

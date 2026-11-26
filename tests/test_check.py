@@ -67,11 +67,26 @@ def test_misfire_ip_overlap():
 def test_cross_check_duplicate_and_order():
     dup = cross_check([b("a", 10, r("host", "x.com")), b("b", 20, r("host", "x.com"))])
     assert any("x.com" in e for e in dup)
+    # 同类型时排在前面的包先命中，更具体的包须排在前面
+    google = b("google", 10, r("host-suffix", "example.com"))
+    claude = b("claude", 20, r("host-suffix", "api.example.com"))
+    assert any("claude" in e and "google" in e for e in cross_check([google, claude]))
+    claude_first = b("claude", 5, r("host-suffix", "api.example.com"))
+    assert cross_check([google, claude_first]) == []
+
+
+def test_cross_check_later_host_beats_earlier_suffix():
+    # host 先于 host-suffix（D-019），排在后面也不会被遮住
     google = b("google", 10, r("host-suffix", "googleapis.com"))
     claude = b("claude", 20, r("host", "maps.googleapis.com"))
-    assert any("claude" in e and "google" in e for e in cross_check([google, claude]))
-    claude_first = b("claude", 5, r("host", "maps.googleapis.com"))
-    assert cross_check([google, claude_first]) == []
+    assert cross_check([google, claude]) == []
+
+
+def test_cross_check_later_suffix_shadows_earlier_wildcard():
+    # 暂定顺序 host-suffix 先于 host-wildcard：前面包的通配符被后面包的后缀抢走
+    a = b("a", 10, r("host-wildcard", "*.api.example.com"))
+    later = b("later", 20, r("host-suffix", "example.com"))
+    assert any("a" in e and "later" in e for e in cross_check([a, later]))
 
 
 def test_overdue_broad():

@@ -187,7 +187,7 @@ v2fly 条目的导入映射（Claude）：
 - 核心：`anthropic.com`、`claude.ai`、`claude.com` 等独有域名用 `host-suffix`。
 - CDN：`servd-anthropic-website.b-cdn.net` 等共享 CDN 上的专属主机用 `host`。
 - 登录：Auth0 租户主机 `anthropic.auth0.com` 用 `host`。
-- 身份验证：`maps.googleapis.com` 用 `host`；它被 `google` 包的 `googleapis.com` 覆盖，因此 `claude` 包须排在 `google` 包之前。Persona 的 `withpersona.com` 为多租户平台，按 `broad` 收录。
+- 身份验证：`maps.googleapis.com` 用 `host`；它落在 `google` 包的 `googleapis.com` 之下，但 `host` 先于 `host-suffix`（D-019），包的先后不影响命中。Persona 的 `withpersona.com` 为多租户平台，按 `broad` 收录。
 - 遥测与风控：
   - 三条关键词规则改写：`sift` 改为 Sift 的独有域名，`datadog` 保留已有主机 `browser-intake-us5-datadoghq.com`，`sentry` 并入 `sentry.io`。
   - `sentry.io`、`statsigapi.net`、`intercom.io` 无法确定专属主机时按 `broad` 收录。
@@ -224,7 +224,7 @@ final, direct
 
 列表第三列写包名，订阅时被 `force-policy` 覆盖；未设置 `force-policy` 时规则会指向不存在的策略，README 中明确提示（Claude）。
 
-各服务包之间不允许完全相同的条目；包含关系允许，但更具体的包必须排在前面，构建时检查（Claude）。
+各服务包之间不允许完全相同的条目；包含关系允许，但每条主机规则都必须先命中本包，构建时检查（Claude）。
 
 ## 构建与检查
 
@@ -236,7 +236,7 @@ final, direct
    - IP 覆盖的判定：代理网段与大陆网段有任何重叠。
    - `ip-asn` 不参与 IP 判定，只在报告中列出。
    - 被 `cn-exception` 先行命中而落到直连的，不算误伤；其余误伤须在清单中用 `exempt` 豁免，否则失败。
-5. 交叉检查：包间的完全重复与包含关系，以及顺序是否满足“更具体的包在前”（Claude）。
+5. 交叉检查：包间的完全重复；每条 `host`、`host-suffix`、`host-wildcard` 规则的值按模拟器路由，须先命中本包，通配符以字母代入 `*` 后试探（Claude）。
 6. 样本测试：`tests/samples.toml` 逐条写明主机或 IP 及期望命中的列表，按同一模拟器判定（Claude）。初始样本取自本次讨论的实测，包括淘宝、微信、B 站应直连，Google、Telegram、Claude 应走对应的包。
 7. 生成：三列格式；文件头注释写数据来源与上游版本，不写生成时间，内容无变化时不产生新提交（Claude）。
 8. 发布：全部检查通过后，用 `GITHUB_TOKEN`（`contents: write`）推送到 `release` 分支，并刷新 jsDelivr 缓存（Claude）。
