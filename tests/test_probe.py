@@ -57,3 +57,10 @@ def test_probe_cases_use_distinct_hosts():
 
     first_hosts = [visit[0] for _, _, visit in PROBE_CASES.values()]
     assert len(set(first_hosts)) == len(first_hosts)
+
+
+def test_probe_profile_can_reference_script_by_url():
+    from quanlight.emit import render_probe_profile
+
+    profile = render_probe_profile("https://x/probe/quanlight-probe.js")["quanlight-probe.conf"]
+    assert "https://x/probe/quanlight-probe.js, tag=quanlight-probe, path=^/quanlight-probe/" in profile

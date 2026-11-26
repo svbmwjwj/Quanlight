@@ -235,7 +235,7 @@ def _cmd_probe(args: argparse.Namespace) -> int:
     for case in PROBE_CASES:
         for name, text in render_probe(case, args.base_url.rstrip("/") + "/probe").items():
             (args.out / name).write_text(text, encoding="utf-8")
-    for name, text in render_probe_profile().items():
+    for name, text in render_probe_profile(args.base_url.rstrip("/") + "/probe/quanlight-probe.js").items():
         (args.out / name).write_text(text, encoding="utf-8")
     return 0
 

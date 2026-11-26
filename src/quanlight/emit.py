@@ -80,7 +80,7 @@ def render_probe(case: str, base_url: str) -> dict[str, str]:
     return files
 
 
-def render_probe_profile() -> dict[str, str]:
+def render_probe_profile(script_ref: str = "quanlight-probe.js") -> dict[str, str]:
     """生成可单独切换使用的探针配置，以及在本机 http_backend 上提供探针列表的脚本。"""
     lists: dict[str, str] = {}
     remote: list[str] = []
@@ -127,7 +127,7 @@ def render_probe_profile() -> dict[str, str]:
             "[task_local]",
             "",
             "[http_backend]",
-            f"quanlight-probe.js, tag=quanlight-probe, path=^/{PROBE_PATH}/, enabled=true",
+            f"{script_ref}, tag=quanlight-probe, path=^/{PROBE_PATH}/, enabled=true",
             "",
             "[mitm]",
         ]
