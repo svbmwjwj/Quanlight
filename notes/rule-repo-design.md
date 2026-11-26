@@ -38,7 +38,7 @@ iOS 与 macOS 都用代理托底：只为中国大陆常用的地址写直连规
 
 Quantumult X 远程列表可用的规则类型以官方 `sample.conf` 为准：`host`、`host-suffix`、`host-wildcard`、`host-keyword`、`ip-cidr`、`ip6-cidr`、`ip-asn`、`geoip`、`user-agent`；不支持正则主机规则，不使用 `no-resolve`（Claude，D-004）。
 
-主机类规则匹配的是应用请求的主机名，不匹配 DNS 解析链上的 CNAME 目标（Claude，D-019）。
+主机类规则匹配的是应用请求的主机名，不匹配 DNS 解析链上的 CNAME 目标（Claude，D-019）。只作为 CNAME 目标出现的名称（如 `*.akadns.net`、`*.edgekey.net`）不收录（Claude，D-019）。
 
 每条规则选能覆盖目标流量的最窄类型（用户：不能用最宽的类型简单粗暴地解决；具体标准 Claude，D-009）：
 

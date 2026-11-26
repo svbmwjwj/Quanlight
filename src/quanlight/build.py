@@ -24,6 +24,8 @@ FINAL = "final"
 # 条目数低于上一版的这个比例时视为上游异常
 MIN_RATIO = 0.5
 _MAX_LISTED = 50  # 报告中逐条列出的上限
+# 只作为 CNAME 目标出现的名称：主机规则不匹配 CNAME 目标（D-019），收录了也是死规则
+CNAME_TARGET_SUFFIXES = ("akadns.net", "edgekey.net")
 _UPSTREAM_HEADER_RE = re.compile(r"^# upstream (\S+): \S+ \(entries: (\d+)\)$")
 
 
@@ -78,7 +80,7 @@ class BuildReport:
             lines += ["### Direct data", "", "| source | version | entries | added |", "|---|---|---|---|"]
             lines += [f"| {k} | {s.version} | {s.entries} | {s.added} |" for k, s in self.sources.items()] + [""]
         for name, n in self.redundant.items():
-            lines.append(f"- {name}: dropped {n} host-suffix rules covered by a shorter suffix")
+            lines.append(f"- {name}: dropped {n} host and host-suffix rules already covered by a suffix")
         for reason, values in sorted(self.skipped.items()):
             lines.append(f"- not imported ({reason}): {len(values)}")
             if reason == "keyword":
@@ -134,6 +136,9 @@ def _merge(bundle: Bundle, upstream: Mapping[str, Upstream], report: BuildReport
         if bad:
             continue
         for rule in data.rules:
+            if is_cname_target(rule.value):
+                report.skipped.setdefault("cname-target", []).append(rule.value)
+                continue
             if rule.value in excluded:
                 used_excludes.add(rule.value)
                 continue
@@ -150,18 +155,27 @@ def _merge(bundle: Bundle, upstream: Mapping[str, Upstream], report: BuildReport
     return dataclasses.replace(bundle, rules=tuple(rules)), header
 
 
-def drop_covered(rules: Sequence[Rule]) -> tuple[list[Rule], int]:
-    """去掉被同列表中更短的 host-suffix 覆盖的 host-suffix。
+def is_cname_target(value: str) -> bool:
+    return any(value == s or value.endswith("." + s) for s in CNAME_TARGET_SUFFIXES)
 
-    同列表、同类型，模拟器下的去向不变；host 等其他类型优先级不同，保留不动。
+
+def drop_covered(rules: Sequence[Rule]) -> tuple[list[Rule], int]:
+    """去掉同列表中已被 host-suffix 覆盖的规则：被更短后缀覆盖的 host-suffix，以及被同值或更短后缀覆盖的 host。
+
+    同一列表内去向不变。host 的优先级高于 host-suffix，去掉后只会让排在前面的列表
+    （APNs）的后缀规则重新先命中，不会让原本走 APNs 的主机改为直连。
     """
     suffixes = {r.value for r in rules if r.type == "host-suffix"}
 
-    def covered(value: str) -> bool:
+    def covered(value: str, start: int) -> bool:
         labels = value.split(".")
-        return any(".".join(labels[i:]) in suffixes for i in range(1, len(labels)))
+        return any(".".join(labels[i:]) in suffixes for i in range(start, len(labels)))
 
-    kept = [r for r in rules if r.type != "host-suffix" or not covered(r.value)]
+    kept = [
+        r
+        for r in rules
+        if not (r.type == "host-suffix" and covered(r.value, 1)) and not (r.type == "host" and covered(r.value, 0))
+    ]
     return kept, len(rules) - len(kept)
 
 

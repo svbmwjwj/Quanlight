@@ -164,10 +164,25 @@ def test_build_replaces_its_own_previous_output(tmp_path):
 def test_drop_covered_keeps_routing():
     from quanlight.build import drop_covered
 
-    rules = [hs("qq.com"), hs("a.qq.com"), hs("b.a.qq.com"), Rule("host", "c.qq.com", "x"), hs("qq.com.cn"), hs("cn")]
+    rules = [
+        hs("qq.com"),
+        hs("a.qq.com"),
+        hs("b.a.qq.com"),
+        Rule("host", "c.qq.com", "x"),
+        Rule("host", "x.example.com", "x"),
+        hs("example.org"),
+        Rule("host", "example.org", "x"),
+        hs("qq.com.cn"),
+        hs("cn"),
+    ]
     kept, dropped = drop_covered(rules)
-    assert [(r.type, r.value) for r in kept] == [("host-suffix", "qq.com"), ("host", "c.qq.com"), ("host-suffix", "cn")]
-    assert dropped == 3
+    assert [(r.type, r.value) for r in kept] == [
+        ("host-suffix", "qq.com"),
+        ("host", "x.example.com"),
+        ("host-suffix", "example.org"),
+        ("host-suffix", "cn"),
+    ]
+    assert dropped == 5
 
 
 def test_build_reports_dropped_suffixes(tmp_path):
@@ -176,7 +191,7 @@ def test_build_reports_dropped_suffixes(tmp_path):
     assert report.errors == []
     assert report.redundant == {"china": 1}
     assert "www.taobao.com" not in (args["out_dir"] / "china.list").read_text()
-    assert "dropped 1 host-suffix" in report.to_markdown()
+    assert "dropped 1 host and host-suffix" in report.to_markdown()
 
 
 def test_allow_foreign_upstream_skips_reverse_check(tmp_path):
@@ -188,3 +203,13 @@ def test_allow_foreign_upstream_skips_reverse_check(tmp_path):
     assert report.errors == []
     assert [h.target for h in report.allowed] == ["t.me"]
     assert "allowed: 1" in report.to_markdown()
+
+
+def test_cname_targets_are_not_imported(tmp_path):
+    args = setup(tmp_path, dnsmasq=("taobao.com", "push-apple.com.akadns.net", "www.example.com.edgekey.net", "akadns.net.cn"))
+    report = build(**args)
+    assert report.errors == []
+    assert sorted(report.skipped["cname-target"]) == ["push-apple.com.akadns.net", "www.example.com.edgekey.net"]
+    china = (args["out_dir"] / "china.list").read_text()
+    assert "akadns.net," not in china and "edgekey.net," not in china
+    assert "not imported (cname-target): 2" in report.to_markdown()
