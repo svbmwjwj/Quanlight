@@ -115,3 +115,12 @@ reason = "APNs host; must reach the apns list instead of direct"
 [[exclude]]
 value = "init-s01st.push.apple.com"
 reason = "APNs host; must reach the apns list instead of direct"
+
+# 大陆 DNS 会把部分境外服务解析到其中国版节点，经 IP 回退直连后被导到中国版；剔除这些网段，让它们落到 final。
+[[exclude]]
+value = "52.130.0.0/15"
+reason = "Azure China; mainland DNS resolves www.linkedin.com to LinkedIn China here, which redirects to linkedin.cn"
+
+[[exclude]]
+value = "202.89.232.0/21"
+reason = "Bing China; mainland DNS resolves www.bing.com here, which serves cn.bing.com"
