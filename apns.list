@@ -1,0 +1,3 @@
+# quanlight apns
+# rules: 1
+host-suffix, push.apple.com, apns
